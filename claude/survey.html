@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>پرسشنامه</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* ============================================================
+     CONFIG — everything you edit lives at the very top.
+     ============================================================ */
+  :root{
+    --bg:#0d1117; --bg-2:#0a0d12; --card:#161b22; --card-hover:#1b212b;
+    --border:#232a35; --border-soft:#1c222b;
+    --text:#e6edf3; --muted:#8b96a5; --faint:#5a6472;
+    --accent:#35d6c3; --accent-dim:rgba(53,214,195,.13); --accent-line:rgba(53,214,195,.35);
+    --shadow:0 10px 30px -12px rgba(0,0,0,.6);
+    --radius:16px;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+  html,body{margin:0}
+  body{
+    font-family:'Vazirmatn',system-ui,sans-serif;
+    background:
+      radial-gradient(1100px 500px at 80% -10%, rgba(53,214,195,.06), transparent 60%),
+      linear-gradient(180deg,var(--bg),var(--bg-2));
+    color:var(--text); line-height:1.85; min-height:100vh;
+    -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+  }
+
+  /* ---- sticky header with progress ---- */
+  header{
+    position:sticky; top:0; z-index:20;
+    backdrop-filter:blur(14px);
+    background:linear-gradient(180deg, rgba(13,17,23,.92), rgba(13,17,23,.72));
+    border-bottom:1px solid var(--border-soft);
+  }
+  .head-inner{max-width:760px; margin:0 auto; padding:16px 20px 12px}
+  .brand{display:flex; align-items:baseline; gap:10px; flex-wrap:wrap}
+  .brand h1{font-size:19px; font-weight:700; margin:0; letter-spacing:-.2px}
+  .brand .sub{font-size:12.5px; color:var(--faint); font-weight:400}
+  .progress-row{display:flex; align-items:center; gap:12px; margin-top:12px}
+  .bar{position:relative; flex:1; height:7px; border-radius:99px; background:#20262f; overflow:hidden}
+  .bar > i{
+    position:absolute; inset-inline-start:0; top:0; bottom:0; width:0%;
+    background:linear-gradient(90deg,var(--accent),#5ce6d6);
+    border-radius:99px; transition:width .35s cubic-bezier(.4,0,.2,1);
+  }
+  .count{font-size:12.5px; color:var(--muted); font-variant-numeric:tabular-nums; white-space:nowrap; min-width:64px; text-align:center}
+  .count b{color:var(--accent); font-weight:600}
+
+  /* ---- intro ---- */
+  main{max-width:760px; margin:0 auto; padding:22px 20px 40px}
+  .intro{
+    background:var(--card); border:1px solid var(--border); border-radius:var(--radius);
+    padding:20px 22px; margin-bottom:22px; color:var(--muted); font-size:14px;
+  }
+  .intro p{margin:0 0 8px} .intro p:last-child{margin:0}
+  .intro .legend{margin-top:14px; display:flex; gap:16px; flex-wrap:wrap; font-size:13px; color:var(--faint)}
+
+  /* ---- optional demographics ---- */
+  .demo{display:flex; gap:12px; flex-wrap:wrap; margin-bottom:22px}
+  .demo label{display:flex; flex-direction:column; gap:6px; flex:1; min-width:130px; font-size:12.5px; color:var(--muted)}
+  .demo input,.demo select{
+    font-family:inherit; font-size:14px; color:var(--text);
+    background:var(--card); border:1px solid var(--border); border-radius:11px;
+    padding:11px 13px; outline:none; transition:border-color .15s;
+  }
+  .demo input:focus,.demo select:focus{border-color:var(--accent-line)}
+  .demo select{appearance:none}
+
+  /* ---- question cards ---- */
+  .q{
+    background:var(--card); border:1px solid var(--border); border-radius:var(--radius);
+    padding:18px 20px; margin-bottom:14px; transition:border-color .2s, background .2s;
+    scroll-margin-top:120px;
+  }
+  .q.answered{border-color:var(--accent-line); background:linear-gradient(var(--accent-dim),var(--accent-dim)),var(--card)}
+  .q-top{display:flex; gap:13px; align-items:flex-start; margin-bottom:15px}
+  .num{
+    flex:none; width:34px; height:34px; border-radius:10px;
+    background:#1d232d; border:1px solid var(--border);
+    display:grid; place-items:center; font-size:13.5px; font-weight:600; color:var(--muted);
+    font-variant-numeric:tabular-nums; transition:.2s;
+  }
+  .q.answered .num{background:var(--accent); color:#06201d; border-color:transparent}
+  .q-text{font-size:15.5px; font-weight:500; padding-top:4px; flex:1}
+
+  .opts{display:flex; gap:10px; flex-wrap:wrap}
+  .opt{
+    flex:1; min-width:92px; cursor:pointer; user-select:none;
+    font-family:inherit; font-size:14.5px; font-weight:500; color:var(--muted);
+    background:#12171e; border:1px solid var(--border); border-radius:12px;
+    padding:12px 8px; text-align:center; transition:.16s;
+  }
+  .opt:hover{border-color:#3a444f; color:var(--text)}
+  .opt:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+  .opt.sel{background:var(--accent); border-color:transparent; color:#06201d; font-weight:600}
+  .opt.sel.na{background:#39424e; color:var(--text)}
+
+  /* ---- submit ---- */
+  .foot{margin-top:26px}
+  .warn{
+    display:none; margin-bottom:14px; font-size:13.5px; color:#f0c36d;
+    background:rgba(240,195,109,.08); border:1px solid rgba(240,195,109,.25);
+    border-radius:12px; padding:12px 15px;
+  }
+  .warn.show{display:block}
+  button.submit{
+    width:100%; font-family:inherit; font-size:16px; font-weight:600; color:#06201d;
+    background:linear-gradient(90deg,var(--accent),#5ce6d6); border:0; border-radius:14px;
+    padding:16px; cursor:pointer; transition:.2s; box-shadow:var(--shadow);
+  }
+  button.submit:hover{filter:brightness(1.06)}
+  button.submit:disabled{opacity:.45; cursor:not-allowed; filter:none}
+
+  /* ---- thank-you ---- */
+  .done{display:none; text-align:center; padding:70px 20px}
+  .done.show{display:block}
+  .done .check{
+    width:74px; height:74px; margin:0 auto 22px; border-radius:50%;
+    background:var(--accent-dim); border:1px solid var(--accent-line);
+    display:grid; place-items:center; color:var(--accent); font-size:34px;
+  }
+  .done h2{font-size:22px; margin:0 0 8px}
+  .done p{color:var(--muted); margin:0}
+
+  .result{text-align:start; margin-top:32px; background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:20px 22px}
+  .result-head{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:6px}
+  .result-head h3{margin:0; font-size:16px; font-weight:600}
+  .tally{display:flex; gap:8px; flex-wrap:wrap; font-size:12.5px; color:var(--muted)}
+  .tally span{background:#1d232d; border:1px solid var(--border); border-radius:99px; padding:4px 11px; font-variant-numeric:tabular-nums}
+  .review{list-style:none; margin:14px 0 0; padding:0; max-height:420px; overflow:auto}
+  .review li{display:flex; gap:12px; align-items:flex-start; padding:11px 4px; border-bottom:1px solid var(--border-soft); font-size:14px}
+  .review li:last-child{border-bottom:0}
+  .review .rn{flex:none; width:30px; color:var(--faint); font-variant-numeric:tabular-nums; font-size:13px}
+  .review .rq{flex:1; color:var(--muted)}
+  .review .ra{flex:none; font-weight:600; color:var(--accent); white-space:nowrap}
+  .review .ra.na{color:var(--faint); font-weight:500}
+  .ghost{margin-top:18px; width:100%; font-family:inherit; font-size:14.5px; font-weight:500; color:var(--text); background:transparent; border:1px solid var(--border); border-radius:12px; padding:12px; cursor:pointer; transition:.15s}
+  .ghost:hover{border-color:var(--accent-line); color:var(--accent)}
+  .ghost:disabled{opacity:.5; cursor:not-allowed}
+  .ghost.primary{color:#06201d; background:linear-gradient(90deg,var(--accent),#5ce6d6); border:0}
+  .result-actions{display:flex; gap:10px}
+  .result-actions .ghost{flex:1}
+  .result-actions .primary{flex:2}
+  #pdfSheet{position:fixed; inset-inline-start:-99999px; top:0; width:794px; background:#fff; color:#14181d;
+    padding:40px 44px; font-family:'Vazirmatn',sans-serif; direction:rtl}
+  #pdfSheet .p-h{font-size:22px; font-weight:700; margin:0 0 4px}
+  #pdfSheet .p-sub{font-size:13px; color:#5a6472; margin:0 0 18px}
+  #pdfSheet .p-tally{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:20px}
+  #pdfSheet .p-tally span{background:#f0f3f6; border:1px solid #dde3ea; border-radius:99px; padding:5px 13px; font-size:12.5px; color:#333}
+  #pdfSheet .p-row{display:flex; gap:12px; padding:9px 0; border-bottom:1px solid #eceff3; font-size:14px; line-height:1.7}
+  #pdfSheet .p-n{flex:none; width:30px; color:#9aa5b1; font-size:12.5px}
+  #pdfSheet .p-q{flex:1; color:#2a2f36}
+  #pdfSheet .p-a{flex:none; font-weight:700; color:#0f8f80; white-space:nowrap}
+  #pdfSheet .p-a.na{color:#9aa5b1; font-weight:500}
+  @media print{
+    header,.foot,.ghost{display:none !important}
+    body{background:#fff; color:#111}
+    .result,.review li{border-color:#ccc}
+    .review .rq{color:#333} .tally span{color:#333}
+  }
+
+  @media (max-width:520px){
+    .q-text{font-size:15px} .opt{min-width:0}
+    .head-inner,main{padding-left:15px; padding-right:15px}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none !important}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="head-inner">
+    <div class="brand">
+      <h1 id="title">پرسشنامه</h1>
+      <span class="sub" id="subtitle">پاسخ‌دهی ناشناس</span>
+    </div>
+    <div class="progress-row">
+      <div class="bar"><i id="barFill"></i></div>
+      <div class="count"><b id="doneN">۰</b> / <span id="totalN">۰</span></div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div id="formArea">
+    <div class="intro">
+      <p id="introText">به هر جمله بر اساس وضعیت خودتان پاسخ دهید. سعی کنید به همهٔ سؤال‌ها پاسخ دهید؛ اگر مطمئن نیستید، نزدیک‌ترین گزینه را انتخاب کنید.</p>
+      <div class="legend">
+        <span>در پایان، خلاصهٔ پاسخ‌های شما نمایش داده می‌شود</span>
+      </div>
+    </div>
+
+    <div class="demo">
+      <label>نام
+        <input id="firstName" type="text" autocomplete="given-name" placeholder="نام">
+      </label>
+      <label>نام خانوادگی
+        <input id="lastName" type="text" autocomplete="family-name" placeholder="نام خانوادگی">
+      </label>
+    </div>
+
+    <!-- Optional, non-identifying. Delete this whole block if you don't need it. -->
+    <div class="demo">
+      <label>سن (اختیاری)
+        <input id="age" type="number" min="0" max="120" inputmode="numeric" placeholder="—">
+      </label>
+      <label>جنسیت (اختیاری)
+        <select id="sex">
+          <option value="">—</option>
+          <option value="زن">زن</option>
+          <option value="مرد">مرد</option>
+          <option value="سایر">سایر</option>
+        </select>
+      </label>
+    </div>
+
+    <div id="questions"></div>
+
+    <div class="foot">
+      <div class="warn" id="warn"></div>
+      <button class="submit" id="submitBtn">ثبت پاسخ‌ها</button>
+    </div>
+  </div>
+
+  <div class="done" id="done">
+    <div class="check">✓</div>
+    <h2>پاسخ‌های شما ثبت شد</h2>
+    <p id="doneName">از همکاری شما سپاسگزاریم.</p>
+
+    <div class="result">
+      <div class="result-head">
+        <h3>خلاصهٔ پاسخ‌های شما</h3>
+        <div class="tally" id="tally"></div>
+      </div>
+      <ul class="review" id="review"></ul>
+      <div class="result-actions">
+        <button class="ghost primary" id="pdfBtn">دانلود PDF</button>
+        <button class="ghost" id="printBtn">چاپ</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- off-screen light-themed sheet used only to render the PDF -->
+  <div id="pdfSheet" aria-hidden="true"></div>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+/* ==================================================================
+   ▼▼▼  EDIT ONLY THIS BLOCK  ▼▼▼
+   ================================================================== */
+const CONFIG = {
+  formspree : "https://formspree.io/f/mojorona",   // your endpoint
+  title     : "پرسشنامه",
+  subtitle  : "لطفاً نام خود را وارد کنید",
+  mode      : "yesno",   // "yesno"  →  بلی / خیر / بدون پاسخ   (correct for MCMI-style tests)
+                         // "scale"  →  ۱ تا ۱۰ + بدون پاسخ    (for your other surveys)
+  requireAll: false,     // true = block submit until every item answered
+  storageKey: "survey_progress_v1"  // set to "" to disable auto-save
+};
+
+// ── YOUR QUESTIONS ─────────────────────────────────────────────
+// Paste your items between the backticks below, ONE PER LINE.
+// Copy straight from your document — leading numbers like "1." or
+// "۱." and blank lines are cleaned up automatically. No quotes or
+// commas needed.
+const RAW_QUESTIONS = `
+اخیرا، حتی صبح ها احساس ضعف و بی حالی می کنم .
+2 . برای قوانین و مقررات احترام زیادی قائلم ، زیرا از حقوق افراد حمایت می کنند .
+3 . به قدری از انجام دادن کارهای مختلف لذن می برم، که نمی توانم تصمیم بگیرم ، کدام یک را اول انجام بدهم.
+4 . بیشتر وقت ها احساس ضعف و خستگی می کنم.
+5 . چون فکر می کنم آدم بزرگ و مهمی هستم برایم مهم نیست که دیگران در مورد من چه فکری می کنند.
+6 . دیگران به اندازه کافی قدر کارها و زحمات مرا نمی دانند.
+7 . اگر خانواده ام به من زور بگویند احتمالا عصبانی می شوم و در برابر خواست آنها مقاومت می کنند.
+8 . مردم پشت سرم در مورد قیافه و رفتارم حرف می زنند و مسخره ام می کنند.
+9. اغلب اگر کسی اذیتم کندبه شدت از او انتقاد می کنم .
+10 . به ندرت تحت تاثیر چیزی قرار می گیرم.
+11 . هنگام راه رفتن نمی توانم تعادلم را حفظ کنم.
+12 . به آسانی و به سرعت احساساتم را بروز می دهم.
+13 . استعمال مواد مخدر اغلب مرا به دردسر می اندازد.
+14 . گاهی اوقات با خانواده ام بسیار تند و خشن برخورد می کنم.
+15 . خوشی های من دوام چندانی ندارند.
+16 . من آدمی خیرخواه و فروتن هستم .
+17 . در نوجوانی به خاطر رفتار بدی که در مدرسه داشتم دچار دردسرهای فراوانی می شدم.
+18 . از ارتباط نزدیک با دیگران می ترسم، زیرا ممکن است رسوا شوم و مسخره ام کنند.
+19 . دوستانی را انتخاب می کنم که بدی هایم را به من گوشزد کنند.
+20 . اغلب از دوره کودکی افکار غم انگیزی به خاطر دارم.
+21 . من ارتباط با جنس مخالف را دوست دارم.
+22 . بسیار دمدمی مزاج هستم، دایم نظرات و احساساتم را تغییر می دهم.
+23 . هرگز مصرف مواد مخدر، مشکل جدی در کارم به وجود نیاورده است .
+24 . چندسالی است که احساس می کنم در زندگی شکست خورده ام .
+25 . نمی دانم چرا اغلب دچار پشیمانی و احساس گناه می شوم.
+26 . دیگران نسبت به قدرت من حسادت می کنند.
+27 . اگر حق انتخاب داشته باشم ترجیح می دهم تنها کار کنم.
+28 . فکر می کنم نظارت و کنترل دقیق بر اعضای خانواده ام لازم و ضروری است.
+29 . دیگران مرا آدمی گوشه گیر و منزوی می دانند.
+30 . اخیرا دلم می خواهد چیزها را بشکنم .
+31 . من با جذابیت خودم می توانم توجه هر فرد خاصی را به خودم جلب کنم .
+32 . من همیشه دنبال این هستم که دوستان جدیددی پیدا کنم و با افراد تازه ای نشست و برخاست کنم.
+33 . اگر کسی از من انتقاد کند فورا خطاها و عیب های او را بیان می کنم .
+34 . تازگی ها به کلی خرد شده ام .
+35 . اغلب از انجام کار دست می کشم، زیرا می ترسم آن را درست انجام ندهم.
+36 . اغلب خشم و عصبانیتم را بروز می دهم و بعد پشیمان می شوم.
+37 . گاهی قدرت حس کردن را در بعضی از قسمت های بدنم از دست می دهم.
+38 . من بدون توجه به این که انجام کاری چه اثری بر دیگران دارد کارم را انجام می دهم.
+39 . مصرف مواد مخدر ممکن است عاقلانه نباشد ولی در گذشته حس می کردم به آن احتیاج دارم .
+40 . من آدم آرام و ترسویی هستم.
+41 . اغلب احمقانه و بی مقدمه رفتار می کنم به طوری که بعدا مرا به دردسر می اندازد.
+42 . هرگز کسی را که از من سوء استفاده کرده نمی بخشم، یا موقعیت دردناکی را که تحمل کرده ام فراموش
+نمی کنم.
+43 . اغلب بعد از آن که حادثه برایم اتفاق افتاد احساس ناراحتی و تنش می کنم.
+44 . اکثر اوقات احساس افسردگی و ناراحتی وحشتناکی دارم.
+45 . همیشه سعی می کنم دیگران را از خود خشنود کنم حتی اگر از آنها بدم بیاید.
+46 . در مقایسه با دیگران ، همیشه کمتر به مسائل جنسی علاقه نشان داده ام .
+47 . وقتی اتفاق بدی می افتد، احساس گناه می کنم.
+48 . از خیلی وقت پیش، صلاح خود را در این دیده ام که با دیگران کمتر رابطه داشته باشم .
+49 . از بچگی مواظب بودم کسی سرم کلاه نگذارد.
+50 . از آدم هایی که خیال می کنند هر کاری را می توانند بهتر از من انجام دهند متنفرم.
+51 . وقتی حوصله ام سر برود ، دوست دارم به کار پر هیجانی دست بزنم.
+52 . اعتیاد من مشکلاتی برای من و خانواده ام به وجود آورده است.
+53 . تنبیه هرگز مانع انجام کاری که دوست دارم نشده است .
+54 . بارها بی دلیل ، شادی و هیجان بیش از حد به من دست داده است.
+55 . چند هفته است که بی دلیل احساس خستگی و فرسودگی می کنم.
+56 . مدتی است که هیچ کاری را درست انجام نمی دهم و به این دلیل شدیدا احساس گناه می کنم.
+57 . فکر می کنم آدمی اجتماعی و خونگرم هستم .
+58 . اخیرا بسیار کم رو و خجالتی شده ام .
+59 . برای روزهای تنگدستی پس انداز می کنم.
+60 . من به اندازه دیگران در زندگی شانس ندارم.
+61 . دائم افکار و اندیشه ها ، در ذهنم موج می زنند و رهایم نمی کنند.
+62 . چند سالی است که از زندگی کاملا دلسرد و ناامید شده ام.
+63 . چند سالی است که افراد زیادی در مورد زندگی خصوصی ام جاسوسی می کنند.
+64 . نمی دانم چرا ولی گاهی حرفهای بد می زنم، صرفا برای این که دیگران را رنجیده خاطر کنم .
+65 . در سال گذشته، بیش از 30 بار بر فراز اقیانوس اطلس پرواز کرده ام.
+66 . در گذشته اعتیاد به مواد مخدر باعث شده شغلم را از دست بدهم.
+67 . فکر های مهمی در سر دارم که مردم این زمانه آن را نمی فهمند.
+68 . اخیرا مجبورم بدون دلیل در مورد چیزی مکررا فکر کنم .
+69 . از اکثر موقعیت های اجتماعی دوری می کنم زیرا می ترسم مردم از من انتقاد کنند یا مرا طرد کنند.
+70 . بیشتر وقتها فکر می کنم شایسته موفقیت هایی که نصیبم شده است نبوده ام .
+71 . اغلب وقتی تنها هستم، احساس می کنم کسی کنارم نشسته که دیده نمی شود.
+72 . اغلب به دیگران اجازه می دهم تصمیم های مهمی برایم بگیرند.
+73 . احساس بی هدفی می کنم و نمی دانم در زندگی به کجا می روم.
+74 . ظاهرا نمی توانم بخوابم و بعد از خواب هم به اندازه قبل از خواب خسته ام .
+75 . اخیرا خیلی عرق می کنم و کلافه ام .
+76 . پیوسته فکرهای عجیبی به سرم می زند کاش می توانستم از شر آنها خلاص شوم.
+77 . حتی وقتی بیدارم متوجه آدم هایی که دور و برم هستند، نمی شوم.
+78 . برایم مشکل است که بر هوس مشروب خواری خود غلبه کنم.
+79 . من اغلب اوقات افسرده و غمگین هستم .
+80 . پیدا کردن دوست برایم کار ساده ای است .
+81 . از سوء استفاده ای که در کودکی از من شده شرمنده ام.
+82 . همیشه نگرانم که کارهایم خوب برنامه ریزی و تنظیم باشد.
+83 . ظاهرا اغلب خلق و خویم از روزی به روز دیگر تغییر زیادی می کند.
+84 . می ترسم ریسک کنم و چیزهای جدید را امتحان کنم .
+85 . سوء استفاده کردن از کسی که خود اجازه چنین کاری را می دهد عیب نمی دانم.
+86 . مدتی است غمگین و گرفته ام و نمی توانم از این حالت خلاص شوم.
+87 . اغلب از دیدن آدم هایی که کند کار می کنند عصبانی می شوم.
+88 . در مهمانی ها هیچوقت گوشه گیر نیستم.
+89 . من آن چه اعضای خانواده ام انجام می دهند را زیر نظر دارم تا به چه کسی می توان اعتماد کرد.
+90 . گاهی در برابر مهربانی مردم دستپاچه و عصبانی می شوم.
+91 . استعمال مواد مخدر باعث درگیری خانوادگی برایم شده است .
+92 . اکثر اوقات تنها هستم و این تنهایی را ترجیح می دهم.
+93 . بعضی از اعضای خانواده ام می گویند که خودخواه هستم و فقط به خودم فکر می کنم .
+94 . مردم خیلی راحت می توانند نظرم را نظرم را عوض کنند حتی اگر تصمیم نهایی را خودم گرفته باشم.
+95 . بیشتر وقت ها به دیگران دستور می دهم و آنها را عصبانی می کنم.
+96 . قبلا دیگران به من گفته اند که به خیلی چیزها بیش از حد شور و علاقه نشان داده ام.
+97 . بهتر است آدم زود بخوابد و زود بیدار شود.
+98 . احساس من نسبت به افراد مهم زندگی ام اغلب بین محبت و نفرت در نوسان است .
+99 . در جمع و موقعیت های اجتماعی همیشه مضطرب و کلافه ام .
+100 . من هر روز مشروب می خورم.
+101 . قبول دارم که مسئولیت های خانوادگی را جدی نمی گیرم ، ولی باید آن ها را جدی بگیرم.
+102 . از همان کودکی بتدریج رابطه خودم را با واقعیت از دست داده ام.
+103 . افراد آب زیرکاه اغلب سعی دارند کاری را که من انجام داده ام یا فکرش از من بوده است را به اسم خودشان
+تمام کنند.
+104 . من نمی توانم شادی زیادی تجربه کنم چون احساس می کنم لیاقتش را ندارم.
+105 . علاقه چندانی به دوست پیدا کردن و رفاقت ندارم.
+106 . بارها در زندگیم وقتی شاد بودم و فعالیت زیادی داشتم حالت افسردگی به من دست داده است.
+107 . اشتهایم را به کلی از دست داده ام.
+108 . من از تنهایی و بی کسی و از این که به خودم متکی باشم می ترسم.
+109 . خاطره یک تجاوز وحشتناک در گذشته، دائم فکر مرا پریشان می کند.
+110 . در سال گذشته عکس من روی جلد مجله های زیادی چاپ شد.
+111 . ظاهرا علاقه ام را به اکثر فعالیت های لذت بخش مثل رابطه جنسی از دست داده ام .
+112 . در یکی دو سال گذشته بسیار غمگین و دلسرد بوده ام.
+113 . یکی دوبار با قانون مشکل داشته ام .
+114 . بهترین راه اجتناب از اشتباه ، تجربه داشتن است.
+115 . مردم به خاطر کاری که انجام نداده ام، به من تهمت می زنند.
+116 . اکثر اوقات عادت دارم برخی از مردم را اذیت کنم.
+117 . گاهی مردم فکر می کنند من عجیب و غریب صحبت می کنم و صحبت های من برای آنها غریب و نا
+آشناست .
+118 . دوره هایی در زندگی من وجود داشته است که قادر به خرید مواد مخدر نبوده ام.
+119 . مردم تلاش دارند مرا بگیرند چون فکر می کنند من دیوانه ام.
+120 . من هرکاری لازم باشد انجام می دهم تا فردی که دوستش دارم مرا ترک نکند.
+121 . یکی دوبار در هفته پرخوری می کنم.
+122 . فکر می کنم تمام فرصت های خوبی که برایم پیش آمد را از دست داده ام.
+123 . هیچ وقت نتوانستم از احساس غم و اندوه رهایی یابم.
+124 . وقتی تنها و دور از خانه هستم اغلب احساس اضطراب و هراس می کنم .
+125 . گاهی مردم از دست من عصبانی می شوند زیرا فکر می کنن من زیاد حرف می زنم یا تند صحبت می کنم .
+126 . امروزه اکثر افراد موفق ، یا خوش شانس اند یا کلاه بردار.
+127 . من نمی خواهم با دیگران رابطه نزدیک پیدا کنم چون مطمئنم به من علاقه مند می شوند.
+128 . بدون علت مشخصی احساس افسردگی می کنم .
+129 . بعد از سالها همچنان در مورد حادثه ای که واقعا زندگی ام را تهدید می کرد، خواب های وحشتناک می بینم.
+130 . توان انجام کارهای روزمره ام را ندارم.
+131 . وقتی به کمک احتیاج دارم الکل می نوشم.
+132 . من از فکر کردن در مورد این که چگونه در کودکی مورد سوء استفاده قرار گرفته ام متنفرم.
+133 . وقتی همه کارها خوب پیش می رود دائم نگرانم، بزودی حادثه بدی اتفاق خواهد افتاد.
+134 . وقتی حادثه بدی در زندگی ام اتفاق می افتد گاهی احساس ناتوانی می کنم و تقریبا دیوانه می شوم.
+135 . واقعا از تنهایی و درماندگی و از دست دادن حمایت نزدیکانم که من به آنها وابسته ام، می ترسم.
+136 . می دانم که پول زیادی برای مواد مخدر خرج کرده ام.
+137 . همیشه قبل از شروع انجام کاری، باید اطمینان پیدا کنم که آن کار در آن مدت محدود تمام می شود.
+138 . می دانم که مردم پشت سرم صحبت می کنند.
+139 . من در گرفتن عفو و بخشش دیگران مهارت دارم.
+140 . می دانم که برایم نقشه کشیده اند .
+141 . احساس می کنم که بیشتر مردم افکار پست و زشتی در مور د من دارند.
+142 . اغلب احساس تنهایی و پوچی می کنم.
+143 . گاهی بعد از غذا خوردن خودم را مجبور به استفراغ می کنم.
+144 . من معتقدم که همه را خوشحال می کنم و دیگران مرا به خاطر کارهایی که انجام می دهم و حرف هایی که
+می زنم تحسین می کنند.
+145 . دائم نگران کسی یا چیزی هستم .
+146 . همیشه بی جهت فریب می خورم، به ویژه وقتی کسی خودش را برتر از من نشان می دهد.
+147 . دائم افکار اضطراب برانگیز به ذهنم می آید.
+148 . در زندگی ام چیزهای کمی وجود دارد که واقعا مرا حوشحال کند.
+149 . وقتی به سرنوشت دردناکی که در گذشته داشته ام فکر می کنم احساس ناکامی کرده و به مرگ می
+اندیشم.
+150 . از این که خیلی زود بیدار می شوم و دیگر نمی توانم بخوابم ناراحتم.
+151 . من هرگز قادر به ابراز احساساتم نیستم چون در نظر مردم ارزشی ندارم.
+152 . من مشکل اعتیاد دارم و تلاشم برای کنارگذاشتن آن ناموفق بوده است.
+153 . عده ای تلاش می کنند افکارم را کنترل کنند.
+154 . قبلا تلاش کرده ام خودم را بکشم.
+155 . من گرسنگی می کشم تا از همین هم که هست لاغر تر شوم.
+156 . نمی دانم چرا برخی از مردم به من می خندند.
+157 . در ده سال گذشته هیچ ماشینی ندیده ام.
+158 . از آدم هایی که مرا لمس می کنند شدیدا می ترسم چون فکر می کنم آنها ممکن است به من صدمه بزنند.
+159 . چون آن ها از توانایی های فوق العاده من خبردارند می خواهد مرا دستگیر کنند.
+160 . دائم فکرم درگیر حادثه ای است که برایم اتفاق افتاده است .
+161 . ظاهرا کاری می کنم که دیگران فکر کنند می خواهم به خودم صدمه بزنم.
+162 . اغلب آن قدر غرق افکارم می شوم که متوجه نمی شوم اطرافم چه می گذرد.
+163 . مردم به من می گویند لاغر هستم ، اما من احساس می کنم خیلی چاقم .
+164 . وقایع هولناک گذشته دائم به فکر و خواب من می آیند .
+165 . من به جز اعضای خانواده ام هیچ دوستی ندارم.
+166 . من اغلب کارهایم را سریع انجام می دهم و در مورد چیزهایی که باید انجام دهم فکر نمی کنم.
+167 . من به گونه ای حمایت دوستانم را جلب کرده ام که دیگران نمی توانند از من سوء استفاده کنند.
+168 . اغلب به وضوح چیزهایی می شنوم که مرا ناراحت می کند.
+169 . من همیشه برای نزاع با دیگران خودم را مجهز نگه می دارم زیرا از برخورد تندشان می ترسم.
+170 . من هر کار را چند بار انجام می دهم . گاهی به خاطر کاهش نگرانیم و گاهی به خاطر این که مطمئن شوم
+حادثه بدی اتفاق نمی افتد .
+171 . تازگی ها به طور جدی به این فکر افتاده ام که به زندگیم خاتمه دهم.
+172 . مردم مرا آدمی منظم و مقرراتی می دانند.
+173 . وقتی به حادثه دردناکی که سالها پیش برایم اتفاق افتاد فکر می کنم دچار ترس و اضطراب می شوم.
+174 . اگر چه من از دوست پیدا کردن می ترسم ولی مایلم دوستان بیشتری داشته باشم.
+175 . واقعیت این است که مردم می خواهند با من دوست شوند تا مرا خرد کنند.
+`;
+
+const QUESTIONS = (() => {
+  const out = [];
+  RAW_QUESTIONS.split("\n").forEach(line => {
+    const t = line.trim();
+    if (!t) return;                                   // skip blank lines
+    const isNew = /^[0-9۰-۹]+\s*[.)\-–]?/.test(t);    // starts with a number = new item
+    if (isNew || out.length === 0) {
+      out.push(t.replace(/^[0-9۰-۹]+\s*[.)\-–]?\s*/, "").trim());  // strip the number
+    } else {
+      out[out.length - 1] += " " + t;                 // continuation → glue to previous
+    }
+  });
+  return out;
+})();
+/* ==================================================================
+   ▲▲▲  STOP EDITING  ▲▲▲   (engine below)
+   ================================================================== */
+
+const fa = n => String(n).replace(/\d/g, d => "۰۱۲۳۴۵۶۷۸۹"[d]);
+const answers = {};
+const $ = id => document.getElementById(id);
+const escapeHtml = value => String(value).replace(/[&<>"']/g, char => ({
+  "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+})[char]);
+const safeFilePart = value => String(value)
+  .normalize("NFKC")
+  .replace(/[<>:"/\\|?*\u0000-\u001F]/g, "")
+  .replace(/\s+/g, "_")
+  .replace(/^\.+|\.+$/g, "")
+  .slice(0, 80) || "responses";
+
+document.title = CONFIG.title;
+$("title").textContent = CONFIG.title;
+$("subtitle").textContent = CONFIG.subtitle;
+$("totalN").textContent = fa(QUESTIONS.length);
+
+// safe storage — never throws (works when self-hosted, no-ops in sandboxes)
+const store = {
+  get(){ try{ return CONFIG.storageKey ? JSON.parse(localStorage.getItem(CONFIG.storageKey)||"{}") : {}; }catch(e){ return {}; } },
+  set(v){ try{ if(CONFIG.storageKey) localStorage.setItem(CONFIG.storageKey, JSON.stringify(v)); }catch(e){} },
+  clear(){ try{ if(CONFIG.storageKey) localStorage.removeItem(CONFIG.storageKey); }catch(e){} }
+};
+
+function optionSet(){
+  if(CONFIG.mode === "scale"){
+    const arr = [];
+    for(let i=1;i<=10;i++) arr.push({v:String(i), label:fa(i)});
+    arr.push({v:"na", label:"بدون پاسخ", na:true});
+    return arr;
+  }
+  return [
+    {v:"yes", label:"بلی"},
+    {v:"no",  label:"خیر"},
+    {v:"na",  label:"بدون پاسخ", na:true}
+  ];
+}
+
+function build(){
+  const wrap = $("questions");
+  const opts = optionSet();
+  const saved = store.get();
+
+  QUESTIONS.forEach((text, i) => {
+    const id = i + 1;
+    const card = document.createElement("section");
+    card.className = "q"; card.id = "q" + id;
+
+    const top = document.createElement("div");
+    top.className = "q-top";
+    const number = document.createElement("div");
+    number.className = "num";
+    number.textContent = fa(id);
+    const question = document.createElement("div");
+    question.className = "q-text";
+    question.textContent = text;
+    top.append(number, question);
+    card.appendChild(top);
+
+    const row = document.createElement("div");
+    row.className = "opts";
+    row.setAttribute("role","group");
+    row.setAttribute("aria-label", "سؤال " + id);
+
+    opts.forEach(o => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "opt" + (o.na ? " na" : "");
+      b.textContent = o.label;
+      b.dataset.v = o.v;
+      b.setAttribute("aria-pressed","false");
+      b.addEventListener("click", () => pick(id, o.v, row, b));
+      row.appendChild(b);
+    });
+    card.appendChild(row);
+    wrap.appendChild(card);
+
+    // restore saved answer
+    if(saved["q"+id] != null){
+      const btn = row.querySelector(`[data-v="${saved["q"+id]}"]`);
+      if(btn) pick(id, saved["q"+id], row, btn, true);
+    }
+  });
+  updateProgress();
+}
+
+function pick(id, val, row, btn, silent){
+  answers["q"+id] = val;
+  row.querySelectorAll(".opt").forEach(o=>{ o.classList.remove("sel"); o.setAttribute("aria-pressed","false"); });
+  btn.classList.add("sel"); btn.setAttribute("aria-pressed","true");
+  $("q"+id).classList.add("answered");
+  if(!silent) store.set(answers);
+  updateProgress();
+}
+
+function updateProgress(){
+  const n = Object.keys(answers).length, total = QUESTIONS.length;
+  $("doneN").textContent = fa(n);
+  $("barFill").style.width = (total ? (n/total*100) : 0) + "%";
+}
+
+function answerLabel(v){
+  if(CONFIG.mode === "scale") return v === "na" ? "بدون پاسخ" : fa(v);
+  return v === "yes" ? "بلی" : v === "no" ? "خیر" : "بدون پاسخ";
+}
+
+async function submit(){
+  const n = Object.keys(answers).length, total = QUESTIONS.length;
+  const warn = $("warn");
+
+  const first = $("firstName").value.trim();
+  const last  = $("lastName").value.trim();
+  if(!first || !last){
+    warn.textContent = "لطفاً نام و نام خانوادگی را وارد کنید.";
+    warn.classList.add("show");
+    (!first ? $("firstName") : $("lastName")).focus();
+    return;
+  }
+
+  if(CONFIG.requireAll && n < total){
+    const missing = [];
+    for(let i=1;i<=total;i++) if(answers["q"+i]==null) missing.push(i);
+    warn.textContent = "لطفاً به همهٔ سؤال‌ها پاسخ دهید. سؤال‌های بی‌پاسخ: " + missing.slice(0,12).map(fa).join("، ") + (missing.length>12 ? " و ..." : "");
+    warn.classList.add("show");
+    document.getElementById("q"+missing[0]).scrollIntoView({behavior:"smooth", block:"center"});
+    return;
+  }
+  warn.classList.remove("show");
+
+  const btn = $("submitBtn");
+  btn.disabled = true; btn.textContent = "در حال ارسال...";
+
+  const payload = {
+    _subject: CONFIG.title + " — پاسخ جدید: " + first + " " + last,
+    first_name: first,
+    last_name: last,
+    submitted_at: new Date().toISOString(),
+    mode: CONFIG.mode,
+    age: $("age") ? $("age").value : "",
+    sex: $("sex") ? $("sex").value : "",
+    answered: n + "/" + total,
+    ...answers
+  };
+
+  try{
+    const res = await fetch(CONFIG.formspree, {
+      method:"POST",
+      headers:{ "Content-Type":"application/json", "Accept":"application/json" },
+      body: JSON.stringify(payload)
+    });
+    if(res.ok){
+      store.clear();
+      renderReview(first, last);
+      $("formArea").style.display = "none";
+      $("done").classList.add("show");
+      window.scrollTo({top:0, behavior:"smooth"});
+    }else{
+      throw new Error("bad status");
+    }
+  }catch(e){
+    btn.disabled = false; btn.textContent = "ثبت پاسخ‌ها";
+    warn.textContent = "ارسال ناموفق بود. اتصال اینترنت را بررسی کنید و دوباره تلاش کنید.";
+    warn.classList.add("show");
+  }
+}
+
+function renderReview(first, last){
+  $("doneName").textContent = first + " " + last + " عزیز، از همکاری شما سپاسگزاریم.";
+
+  const counts = {};
+  for(const k in answers){ const v = answers[k]; counts[v] = (counts[v]||0)+1; }
+  const order = CONFIG.mode === "scale"
+    ? [...Array(10)].map((_,i)=>String(i+1)).concat("na")
+    : ["yes","no","na"];
+  $("tally").innerHTML = order
+    .filter(v => counts[v])
+    .map(v => `<span>${escapeHtml(answerLabel(v))}: ${fa(counts[v])}</span>`)
+    .join("") + `<span>پاسخ‌داده‌شده: ${fa(Object.keys(answers).length)} / ${fa(QUESTIONS.length)}</span>`;
+
+  $("review").innerHTML = QUESTIONS.map((text, i) => {
+    const v = answers["q"+(i+1)];
+    const ans = v == null
+      ? `<div class="ra na">—</div>`
+      : `<div class="ra${v==="na"?" na":""}">${escapeHtml(answerLabel(v))}</div>`;
+    return `<li><div class="rn">${fa(i+1)}</div><div class="rq">${escapeHtml(text)}</div>${ans}</li>`;
+  }).join("");
+
+  // build the light-themed sheet used for PDF export
+  const tallyHtml = order.filter(v => counts[v])
+    .map(v => `<span>${escapeHtml(answerLabel(v))}: ${fa(counts[v])}</span>`).join("")
+    + `<span>پاسخ‌داده‌شده: ${fa(Object.keys(answers).length)} / ${fa(QUESTIONS.length)}</span>`;
+  const rows = QUESTIONS.map((text, i) => {
+    const v = answers["q"+(i+1)];
+    const a = v == null ? `<div class="p-a na">—</div>`
+                        : `<div class="p-a${v==="na"?" na":""}">${escapeHtml(answerLabel(v))}</div>`;
+    return `<div class="p-row"><div class="p-n">${fa(i+1)}</div><div class="p-q">${escapeHtml(text)}</div>${a}</div>`;
+  }).join("");
+  const when = new Date().toLocaleString("fa-IR");
+  $("pdfSheet").innerHTML =
+    `<div class="p-h">${escapeHtml(CONFIG.title)}</div>` +
+    `<div class="p-sub">${escapeHtml(first)} ${escapeHtml(last)} — ${escapeHtml(when)}</div>` +
+    `<div class="p-tally">${tallyHtml}</div>` + rows;
+
+  pdfName = safeFilePart(first + "-" + last);
+}
+
+let pdfName = "responses";
+
+async function downloadPDF(){
+  const btn = $("pdfBtn");
+  if(!(window.jspdf && window.html2canvas)){ window.print(); return; }  // fallback if libs blocked
+  btn.disabled = true; const label = btn.textContent; btn.textContent = "در حال ساخت PDF...";
+  try{
+    const sheet = $("pdfSheet");
+    const canvas = await html2canvas(sheet, { scale: 2, backgroundColor: "#ffffff", windowWidth: 794 });
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF("p", "mm", "a4");
+    const pw = 210, ph = 297;
+    const imgW = pw;
+    const imgH = canvas.height * pw / canvas.width;
+    const img = canvas.toDataURL("image/jpeg", 0.92);
+    let pos = 0, remaining = imgH;
+    pdf.addImage(img, "JPEG", 0, pos, imgW, imgH);
+    remaining -= ph;
+    while(remaining > 0){
+      pos -= ph;
+      pdf.addPage();
+      pdf.addImage(img, "JPEG", 0, pos, imgW, imgH);
+      remaining -= ph;
+    }
+    pdf.save(safeFilePart(CONFIG.title || "survey") + "-" + pdfName + ".pdf");
+  }catch(e){
+    window.print();  // graceful fallback
+  }finally{
+    btn.disabled = false; btn.textContent = label;
+  }
+}
+
+$("pdfBtn").addEventListener("click", downloadPDF);
+$("printBtn").addEventListener("click", () => window.print());
+$("submitBtn").addEventListener("click", submit);
+build();
+</script>
+</body>
+</html>

@@ -30,7 +30,7 @@ const PALETTE = {
 
 /* section index → shape + camera preset */
 const SECTION_PRESETS = [
-  { shape: "brain", cam: [0.0, 0.25, 5.6], look: [0, 0, 0], spin: 0.1, offX: 0.0 },
+  { shape: "brain", cam: [0.0, 0.25, 5.6], look: [0, 0, 0], spin: 0.1, offX: -2.0 },
   { shape: "brain", cam: [0.9, 0.55, 4.6], look: [0, 0.05, 0], spin: 0.16, offX: -1.15 },
   { shape: "heart", cam: [0.0, 0.1, 5.2], look: [0, 0, 0], spin: 0.12, offX: -1.15 },
   { shape: "lotus", cam: [0.0, 0.9, 5.5], look: [0, -0.75, 0], spin: 0.14, offX: -1.15 },
@@ -554,7 +554,7 @@ const obsessionSprites = [];
     );
     sprite.scale.set(1.35, 0.34, 1);
     sprite.userData = {
-      radius: 2.05 + (k % 4) * 0.28,
+      radius: 1.85 + (k % 4) * 0.24,
       speed: (0.22 + (k % 3) * 0.09) * (k % 2 === 0 ? 1 : -1),
       phase: (k / OBSESSIONS.length) * Math.PI * 2,
       wobble: 0.55 + (k % 3) * 0.25,
