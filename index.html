@@ -10,7 +10,7 @@
       content="تجربه سه‌بعدی سولی‌سول برای شناخت ذهن، خدمات روان‌شناسی و شروع یک مسیر درمانی انسانی."
     />
     <link rel="preload" href="./assets/brain-lite.glb" as="fetch" type="model/gltf-binary" crossorigin />
-    <link rel="stylesheet" href="./styles.css?v=brain-load-fix-v4" />
+    <link rel="stylesheet" href="./styles.css?v=brain-reliability-v5" />
     <script type="importmap">
       {
         "imports": {
@@ -59,6 +59,11 @@
     </aside>
 
     <div class="brain-stage hero-active" aria-label="مدل تعاملی سه‌بعدی مغز انسان">
+      <div class="brain-fallback" aria-hidden="true">
+        <span></span>
+        <span></span>
+        <i></i>
+      </div>
       <canvas id="brain-canvas" aria-hidden="true"></canvas>
       <div class="world-grid" aria-hidden="true"></div>
       <div id="brain-loader" class="brain-loader" role="status" aria-label="در حال بارگذاری مغز سه‌بعدی">
@@ -364,6 +369,6 @@
       <a href="#top">بازگشت به بالا ↑</a>
     </footer>
 
-    <script type="module" src="./script.js?v=brain-load-fix-v4"></script>
+    <script type="module" src="./script.js?v=brain-reliability-v5"></script>
   </body>
 </html>

@@ -146,6 +146,60 @@ p {
   cursor: grabbing;
 }
 
+.brain-fallback {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  left: 31%;
+  width: min(34vw, 480px);
+  aspect-ratio: 1.22;
+  opacity: 0;
+  filter: drop-shadow(0 0 28px rgba(50, 155, 255, 0.62));
+  transform: translate(-50%, -50%) rotate(-7deg);
+  transition: opacity 300ms ease;
+  pointer-events: none;
+}
+
+.brain-fallback span {
+  position: absolute;
+  top: 9%;
+  width: 61%;
+  height: 76%;
+  border: 2px solid rgba(138, 239, 255, 0.78);
+  border-radius: 52% 47% 48% 51% / 48% 54% 46% 52%;
+  background:
+    repeating-radial-gradient(circle at 42% 48%, transparent 0 9px, rgba(90, 194, 255, 0.2) 10px 11px),
+    radial-gradient(circle at 50% 50%, rgba(22, 112, 255, 0.5), rgba(3, 28, 88, 0.76) 68%);
+  box-shadow: inset 0 0 34px rgba(72, 194, 255, 0.38), 0 0 24px rgba(44, 143, 255, 0.5);
+}
+
+.brain-fallback span:first-child {
+  left: 3%;
+  transform: rotate(-8deg);
+}
+
+.brain-fallback span:nth-child(2) {
+  right: 3%;
+  transform: rotate(8deg) scaleX(-1);
+}
+
+.brain-fallback i {
+  position: absolute;
+  left: 48%;
+  bottom: 2%;
+  width: 13%;
+  height: 31%;
+  border-radius: 0 0 50% 50%;
+  background: linear-gradient(180deg, rgba(80, 199, 255, 0.72), rgba(12, 69, 186, 0.24));
+  box-shadow: 0 0 20px rgba(45, 154, 255, 0.58);
+  transform: rotate(8deg);
+}
+
+.brain-stage.brain-unavailable .brain-fallback,
+.brain-stage.brain-context-lost .brain-fallback {
+  opacity: 0.9;
+}
+
 .brain-stage::before,
 .brain-stage::after {
   content: "";
@@ -198,6 +252,11 @@ p {
   transition: opacity 600ms ease, visibility 600ms ease;
 }
 
+.brain-loader.has-preview {
+  background: rgba(2, 15, 36, 0.62);
+  backdrop-filter: blur(2px);
+}
+
 .brain-loader span {
   width: 68px;
   aspect-ratio: 1;
@@ -223,6 +282,11 @@ p {
 .brain-loader.has-error span {
   border-color: var(--rose);
   animation: none;
+}
+
+.brain-stage.brain-unavailable .brain-loader,
+.brain-stage.brain-context-lost .brain-loader {
+  background: rgba(2, 15, 36, 0.72);
 }
 
 @keyframes spin {
@@ -1629,7 +1693,7 @@ main,
   }
 
   body::before {
-    background: linear-gradient(180deg, rgba(5, 11, 9, 0.08), rgba(5, 11, 9, 0.54));
+    background: linear-gradient(180deg, rgba(2, 15, 36, 0.04), rgba(2, 15, 36, 0.32));
   }
 
   .site-header {
@@ -1653,10 +1717,16 @@ main,
     pointer-events: none;
   }
 
+  .brain-fallback {
+    top: 55%;
+    left: 50%;
+    width: min(72vw, 360px);
+  }
+
   .brain-stage::before {
     background:
-      linear-gradient(180deg, rgba(5, 11, 9, 0.22), rgba(5, 11, 9, 0.65)),
-      radial-gradient(circle at 50% 60%, transparent, rgba(5, 11, 9, 0.36));
+      linear-gradient(180deg, rgba(2, 15, 36, 0.08), rgba(2, 15, 36, 0.38)),
+      radial-gradient(circle at 50% 68%, transparent 0 24%, rgba(2, 15, 36, 0.14) 72%);
   }
 
   .world-grid {
@@ -1680,7 +1750,7 @@ main,
   .blogs-section::before,
   .contact-section::before {
     background:
-      linear-gradient(180deg, rgba(5, 11, 9, 0.94) 0 42%, rgba(5, 11, 9, 0.36) 68%, rgba(5, 11, 9, 0.88));
+      linear-gradient(180deg, rgba(5, 11, 9, 0.94) 0 43%, rgba(2, 15, 36, 0.14) 63% 79%, rgba(5, 11, 9, 0.82));
   }
 
   .hero-layout {

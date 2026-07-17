@@ -147,6 +147,35 @@ const motionButton = document.querySelector("#brain-motion");
 const resetButton = document.querySelector("#brain-reset");
 const sceneNumber = document.querySelector("#scene-number");
 const sceneName = document.querySelector("#scene-name");
+const initialMobileViewport = window.innerWidth <= 760;
+const staticLowPowerDevice =
+  (navigator.deviceMemory || 8) <= 4 || (navigator.hardwareConcurrency || 8) <= 4;
+const initialReducedEffects = initialMobileViewport || staticLowPowerDevice;
+let isMobile = initialMobileViewport;
+let reducedEffects = initialReducedEffects;
+
+function showBrainFallback(message) {
+  stage?.classList.add("brain-unavailable");
+  loaderElement?.classList.add("has-error");
+  const loaderText = loaderElement?.querySelector("p");
+  if (loaderText) loaderText.textContent = message;
+  loaderElement?.setAttribute("aria-label", message);
+}
+
+let renderer = null;
+try {
+  renderer = new THREE.WebGLRenderer({
+    canvas,
+    antialias: !initialReducedEffects,
+    alpha: false,
+    powerPreference: initialReducedEffects ? "default" : "high-performance",
+    failIfMajorPerformanceCaveat: false,
+  });
+} catch {
+  showBrainFallback("نمای ساده مغز نمایش داده شد؛ پردازش سه‌بعدی در این دستگاه در دسترس نیست");
+}
+
+if (renderer) {
 
 const scene = new THREE.Scene();
 scene.fog = new THREE.FogExp2(0x020f24, 0.041);
@@ -154,12 +183,6 @@ scene.fog = new THREE.FogExp2(0x020f24, 0.041);
 const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 70);
 camera.position.set(0, 0, 8.6);
 
-const renderer = new THREE.WebGLRenderer({
-  canvas,
-  antialias: true,
-  alpha: false,
-  powerPreference: "high-performance",
-});
 renderer.setClearColor(0x020f24, 1);
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -190,10 +213,10 @@ scene.add(modelPivot);
 
 const brainMaterial = new THREE.ShaderMaterial({
   uniforms: {
-    uOpacity: { value: 0.55 },
+    uOpacity: { value: initialReducedEffects ? 0.7 : 0.62 },
     uPulse: { value: 0 },
-    uColor: { value: new THREE.Color(0x0755c7) },
-    uGlowColor: { value: new THREE.Color(0x88efff) },
+    uColor: { value: new THREE.Color(0x087be8) },
+    uGlowColor: { value: new THREE.Color(0xa4f8ff) },
   },
   vertexShader: `
     varying vec3 vViewPosition;
@@ -216,12 +239,12 @@ const brainMaterial = new THREE.ShaderMaterial({
       if (!gl_FrontFacing) normal *= -1.0;
       vec3 viewDirection = normalize(-vViewPosition);
       vec3 lightDirection = normalize(vec3(-0.35, 0.58, 0.74));
-      float light = 0.3 + 0.7 * max(dot(normal, lightDirection), 0.0);
+      float light = 0.4 + 0.72 * max(dot(normal, lightDirection), 0.0);
       float fresnel = pow(1.0 - abs(dot(normal, viewDirection)), 2.0);
       vec3 baseColor = uColor * light;
       vec3 finalColor = mix(baseColor, uGlowColor, fresnel * 0.88);
       finalColor += uGlowColor * uPulse * 0.08;
-      gl_FragColor = vec4(finalColor, (0.58 + fresnel * 0.3) * uOpacity);
+      gl_FragColor = vec4(finalColor, (0.7 + fresnel * 0.25) * uOpacity);
     }
   `,
   transparent: true,
@@ -231,7 +254,7 @@ const brainMaterial = new THREE.ShaderMaterial({
   extensions: { derivatives: true },
 });
 
-const brainBaseOpacity = 0.55;
+const brainBaseOpacity = initialReducedEffects ? 0.7 : 0.62;
 const brainAuraMaterial = new THREE.ShaderMaterial({
   uniforms: {
     uOpacity: { value: 0.94 },
@@ -259,7 +282,7 @@ const brainAuraMaterial = new THREE.ShaderMaterial({
       vec3 viewDirection = normalize(-vViewPosition);
       float facing = abs(dot(normal, viewDirection));
       float fresnel = pow(1.0 - facing, 2.15);
-      vec3 glowColor = mix(uInnerColor * 0.35, uEdgeColor * 1.6, fresnel);
+      vec3 glowColor = mix(uInnerColor * 0.45, uEdgeColor * 1.8, fresnel);
       float alpha = (0.035 + fresnel * 1.2) * uOpacity;
       gl_FragColor = vec4(glowColor, alpha);
     }
@@ -271,6 +294,31 @@ const brainAuraMaterial = new THREE.ShaderMaterial({
   toneMapped: false,
   extensions: { derivatives: true },
 });
+
+const defaultBrainRotation = new THREE.Euler(0, -1.05, Math.PI / 2);
+const placeholderBrain = new THREE.Group();
+const placeholderGeometry = new THREE.IcosahedronGeometry(1, reducedEffects ? 3 : 4);
+
+[-0.43, 0.43].forEach((x, index) => {
+  const lobe = new THREE.Mesh(placeholderGeometry, brainMaterial);
+  lobe.position.x = x;
+  lobe.scale.set(0.82, 1.08, 0.76);
+  lobe.rotation.z = index === 0 ? -0.12 : 0.12;
+
+  const aura = new THREE.Mesh(placeholderGeometry, brainAuraMaterial);
+  aura.scale.setScalar(1.018);
+  aura.renderOrder = 2;
+  lobe.add(aura);
+  placeholderBrain.add(lobe);
+});
+
+placeholderBrain.scale.setScalar(1.58);
+placeholderBrain.position.y = 0.06;
+brainSpin.rotation.copy(defaultBrainRotation);
+brainSpin.add(placeholderBrain);
+stage.classList.add("brain-preview");
+stage.dataset.brainState = "preview";
+loaderElement.classList.add("has-preview");
 
 const sceneStates = {
   hero: {
@@ -339,7 +387,7 @@ const sceneStates = {
 };
 
 const mobileSceneStates = {
-  hero: { position: [0, -1.25, -1.1], scale: 0.7, opacity: 0.88 },
+  hero: { position: [0, -1.18, -0.65], scale: 0.82, opacity: 1 },
   about: { position: [0, 1.85, -1.45], scale: 0.66, opacity: 0.56 },
   services: { position: [0, 0, -2.2], scale: 0.64, opacity: 0.25 },
   process: { position: [0, 0.5, -1.9], scale: 0.68, opacity: 0.35 },
@@ -355,7 +403,6 @@ const targetRotation = new THREE.Euler();
 let targetOpacity = 1;
 let targetRingOpacity = 0.18;
 let activeScene = "hero";
-let isMobile = window.innerWidth <= 760;
 
 const orbitVisual = new THREE.Group();
 modelPivot.add(orbitVisual);
@@ -397,7 +444,7 @@ const markerAnchors = [
   return anchor;
 });
 
-const particleCount = isMobile ? 360 : 820;
+const particleCount = reducedEffects ? 280 : 820;
 const particlePositions = new Float32Array(particleCount * 3);
 const particleColors = new Float32Array(particleCount * 3);
 const particlePalette = [
@@ -456,7 +503,7 @@ function createGlowTexture() {
 
 const glowTexture = createGlowTexture();
 const neuralCore = new THREE.Group();
-const neuralPointCount = isMobile ? 190 : 440;
+const neuralPointCount = reducedEffects ? 150 : 440;
 const neuralPositions = new Float32Array(neuralPointCount * 3);
 const neuralColors = new Float32Array(neuralPointCount * 3);
 const neuralVectors = [];
@@ -496,7 +543,7 @@ neuralGeometry.setAttribute("color", new THREE.BufferAttribute(neuralColors, 3))
 
 const neuralPointMaterial = new THREE.PointsMaterial({
   map: glowTexture,
-  size: isMobile ? 0.105 : 0.09,
+  size: reducedEffects ? 0.105 : 0.09,
   sizeAttenuation: true,
   vertexColors: true,
   transparent: true,
@@ -511,7 +558,7 @@ const neuralPointMaterial = new THREE.PointsMaterial({
 const surfaceSparkMaterial = new THREE.PointsMaterial({
   map: glowTexture,
   color: 0xd9fcff,
-  size: isMobile ? 0.09 : 0.078,
+  size: reducedEffects ? 0.09 : 0.078,
   sizeAttenuation: true,
   transparent: true,
   opacity: 0.92,
@@ -579,77 +626,110 @@ modelPivot.add(floorGlow);
 
 let brainModel = null;
 const modelLoader = new GLTFLoader();
+const brainModelUrl = "./assets/brain-lite.glb";
+const maxBrainLoadAttempts = 3;
+let loadWatchdogId = window.setTimeout(() => {
+  if (brainModel) return;
+  stage.classList.add("brain-ready", "brain-delayed");
+  stage.dataset.brainState = "preview";
+  loaderElement.classList.add("is-loaded");
+  loaderElement.setAttribute("aria-label", "نمای سریع مغز آماده است؛ جزئیات در حال بارگذاری است");
+}, 6500);
 
-modelLoader.load(
-  "./assets/brain-lite.glb",
-  (gltf) => {
-    brainModel = gltf.scene;
-    const brainMeshes = [];
-    brainModel.traverse((object) => {
-      if (!object.isMesh) return;
-      object.material = brainMaterial;
-      object.frustumCulled = true;
-      brainMeshes.push(object);
-    });
+function installDetailedBrain(gltf) {
+  brainModel = gltf.scene;
+  const brainMeshes = [];
+  brainModel.traverse((object) => {
+    if (!object.isMesh) return;
+    object.material = brainMaterial;
+    object.frustumCulled = true;
+    brainMeshes.push(object);
+  });
 
-    const bounds = new THREE.Box3().setFromObject(brainModel);
-    const center = bounds.getCenter(new THREE.Vector3());
-    const size = bounds.getSize(new THREE.Vector3());
-    const scale = 3.75 / Math.max(size.x, size.y, size.z);
-    brainModel.position.copy(center).multiplyScalar(-scale);
-    brainModel.scale.setScalar(scale);
+  const bounds = new THREE.Box3().setFromObject(brainModel);
+  const center = bounds.getCenter(new THREE.Vector3());
+  const size = bounds.getSize(new THREE.Vector3());
+  const scale = 3.75 / Math.max(size.x, size.y, size.z);
+  brainModel.position.copy(center).multiplyScalar(-scale);
+  brainModel.scale.setScalar(scale);
 
-    brainMeshes.forEach((mesh) => {
-      const aura = new THREE.Mesh(mesh.geometry, brainAuraMaterial);
-      aura.scale.setScalar(1.006);
-      aura.renderOrder = 2;
-      mesh.add(aura);
+  brainMeshes.forEach((mesh) => {
+    const aura = new THREE.Mesh(mesh.geometry, brainAuraMaterial);
+    aura.scale.setScalar(1.006);
+    aura.renderOrder = 2;
+    mesh.add(aura);
 
-      const sourcePositions = mesh.geometry.getAttribute("position");
-      const sampleCount = Math.min(isMobile ? 180 : 420, sourcePositions.count);
-      const sampledPositions = new Float32Array(sampleCount * 3);
-      const stride = Math.max(1, Math.floor(sourcePositions.count / sampleCount));
-      for (let index = 0; index < sampleCount; index += 1) {
-        const sourceIndex = Math.min(
-          sourcePositions.count - 1,
-          index * stride + ((index * 13) % stride),
-        );
-        sampledPositions[index * 3] = sourcePositions.getX(sourceIndex);
-        sampledPositions[index * 3 + 1] = sourcePositions.getY(sourceIndex);
-        sampledPositions[index * 3 + 2] = sourcePositions.getZ(sourceIndex);
-      }
-      const surfaceSparkGeometry = new THREE.BufferGeometry();
-      surfaceSparkGeometry.setAttribute(
-        "position",
-        new THREE.BufferAttribute(sampledPositions, 3),
+    const sourcePositions = mesh.geometry.getAttribute("position");
+    const sampleCount = Math.min(reducedEffects ? 180 : 420, sourcePositions.count);
+    const sampledPositions = new Float32Array(sampleCount * 3);
+    const stride = Math.max(1, Math.floor(sourcePositions.count / sampleCount));
+    for (let index = 0; index < sampleCount; index += 1) {
+      const sourceIndex = Math.min(
+        sourcePositions.count - 1,
+        index * stride + ((index * 13) % stride),
       );
-      const surfaceSparks = new THREE.Points(surfaceSparkGeometry, surfaceSparkMaterial);
-      surfaceSparks.scale.setScalar(1.008);
-      surfaceSparks.renderOrder = 9;
-      mesh.add(surfaceSparks);
-    });
-
-    brainSpin.add(brainModel);
-    brainSpin.rotation.set(0, -1.05, Math.PI / 2);
-
-    loaderElement.classList.add("is-loaded");
-    stage.classList.add("brain-ready");
-  },
-  (progressEvent) => {
-    if (!progressEvent.total) return;
-    const progress = Math.min(
-      99,
-      Math.round((progressEvent.loaded / progressEvent.total) * 100),
+      sampledPositions[index * 3] = sourcePositions.getX(sourceIndex);
+      sampledPositions[index * 3 + 1] = sourcePositions.getY(sourceIndex);
+      sampledPositions[index * 3 + 2] = sourcePositions.getZ(sourceIndex);
+    }
+    const surfaceSparkGeometry = new THREE.BufferGeometry();
+    surfaceSparkGeometry.setAttribute(
+      "position",
+      new THREE.BufferAttribute(sampledPositions, 3),
     );
-    loaderElement.querySelector("p").textContent =
-      `در حال بارگذاری مغز سه‌بعدی · ${progress}٪`;
-  },
-  () => {
-    loaderElement.classList.add("has-error");
-    loaderElement.querySelector("p").textContent = "بارگذاری مدل سه‌بعدی ناموفق بود";
-    loaderElement.setAttribute("aria-label", "بارگذاری مدل سه‌بعدی ناموفق بود");
-  },
-);
+    const surfaceSparks = new THREE.Points(surfaceSparkGeometry, surfaceSparkMaterial);
+    surfaceSparks.scale.setScalar(1.008);
+    surfaceSparks.renderOrder = 9;
+    mesh.add(surfaceSparks);
+  });
+
+  brainSpin.add(brainModel);
+  brainSpin.rotation.copy(defaultBrainRotation);
+  placeholderBrain.visible = false;
+  window.clearTimeout(loadWatchdogId);
+  stage.classList.remove("brain-preview", "brain-delayed", "brain-fallback");
+  stage.classList.add("brain-ready");
+  stage.dataset.brainState = "detailed";
+  loaderElement.classList.remove("has-preview", "has-error");
+  loaderElement.classList.add("is-loaded");
+  loaderElement.setAttribute("aria-label", "مغز سه‌بعدی آماده است");
+}
+
+function loadBrainModel(attempt = 0) {
+  const requestUrl = attempt
+    ? `${brainModelUrl}?retry=${attempt}-${Date.now()}`
+    : brainModelUrl;
+
+  modelLoader.load(
+    requestUrl,
+    installDetailedBrain,
+    (progressEvent) => {
+      if (!progressEvent.total || loaderElement.classList.contains("is-loaded")) return;
+      const progress = Math.min(
+        99,
+        Math.round((progressEvent.loaded / progressEvent.total) * 100),
+      );
+      loaderElement.querySelector("p").textContent =
+        `در حال بارگذاری مغز سه‌بعدی · ${progress}٪`;
+    },
+    () => {
+      const nextAttempt = attempt + 1;
+      if (nextAttempt < maxBrainLoadAttempts) {
+        loaderElement.querySelector("p").textContent = "در حال تلاش دوباره برای بارگذاری مغز…";
+        window.setTimeout(() => loadBrainModel(nextAttempt), 500 * nextAttempt);
+        return;
+      }
+
+      window.clearTimeout(loadWatchdogId);
+      stage.classList.add("brain-ready", "brain-fallback");
+      stage.dataset.brainState = "fallback";
+      loaderElement.classList.add("is-loaded");
+      loaderElement.setAttribute("aria-label", "نمای جایگزین مغز آماده است");
+    },
+  );
+}
+
+loadBrainModel();
 
 function currentSceneState(key) {
   const desktop = sceneStates[key] || sceneStates.hero;
@@ -736,7 +816,7 @@ motionButton?.addEventListener("click", () => {
 });
 
 resetButton?.addEventListener("click", () => {
-  brainSpin.rotation.set(0, -1.05, Math.PI / 2);
+  brainSpin.rotation.copy(defaultBrainRotation);
   motionEnabled = !prefersReducedMotion;
   updateMotionButton();
 });
@@ -780,11 +860,32 @@ function endDrag(event) {
 canvas.addEventListener("pointerup", endDrag);
 canvas.addEventListener("pointercancel", endDrag);
 
+canvas.addEventListener("webglcontextlost", (event) => {
+  event.preventDefault();
+  stage.classList.add("brain-context-lost");
+  stage.dataset.brainState = "context-lost";
+  loaderElement.classList.remove("is-loaded");
+  loaderElement.classList.add("has-error");
+  loaderElement.querySelector("p").textContent = "در حال بازیابی نمایش سه‌بعدی…";
+  loaderElement.setAttribute("aria-label", "در حال بازیابی نمایش سه‌بعدی");
+});
+
+canvas.addEventListener("webglcontextrestored", () => {
+  stage.classList.remove("brain-context-lost");
+  stage.classList.add("brain-ready");
+  stage.dataset.brainState = brainModel ? "detailed" : "preview";
+  loaderElement.classList.remove("has-error");
+  loaderElement.classList.add("is-loaded");
+  loaderElement.setAttribute("aria-label", "نمای سه‌بعدی بازیابی شد");
+  renderer.resetState();
+});
+
 function resizeRenderer() {
   const width = window.innerWidth;
   const height = window.innerHeight;
   isMobile = width <= 760;
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, isMobile ? 1.2 : 1.65));
+  reducedEffects = isMobile || staticLowPowerDevice;
+  renderer.setPixelRatio(reducedEffects ? 1 : Math.min(window.devicePixelRatio || 1, 1.5));
   renderer.setSize(width, height, false);
   camera.aspect = width / height;
   camera.fov = isMobile ? 46 : 38;
@@ -823,8 +924,11 @@ function updateMarkers() {
 }
 
 const clock = new THREE.Clock();
+let animationFrameId = 0;
 
 function animate() {
+  animationFrameId = 0;
+  if (document.hidden) return;
   const delta = Math.min(clock.getDelta(), 0.05);
   const elapsed = clock.elapsedTime;
   const smoothing = prefersReducedMotion ? 1 : 1 - Math.pow(0.002, delta);
@@ -838,7 +942,7 @@ function animate() {
   modelPivot.rotation.y = THREE.MathUtils.lerp(modelPivot.rotation.y, targetRotation.y, smoothing);
   modelPivot.rotation.z = THREE.MathUtils.lerp(modelPivot.rotation.z, targetRotation.z, smoothing);
 
-  if (motionEnabled && brainModel) {
+  if (motionEnabled) {
     brainSpin.rotation.y += delta * (activeScene === "hero" ? 0.13 : 0.045);
   }
 
@@ -861,14 +965,14 @@ function animate() {
     smoothing,
   );
   neuralPointMaterial.size =
-    (isMobile ? 0.105 : 0.09) + (motionEnabled ? Math.sin(elapsed * 2.2) * 0.009 : 0);
+    (reducedEffects ? 0.105 : 0.09) + (motionEnabled ? Math.sin(elapsed * 2.2) * 0.009 : 0);
   surfaceSparkMaterial.opacity = THREE.MathUtils.lerp(
     surfaceSparkMaterial.opacity,
     targetOpacity,
     smoothing,
   );
   surfaceSparkMaterial.size =
-    (isMobile ? 0.09 : 0.078) + (motionEnabled ? Math.sin(elapsed * 2.65 + 0.6) * 0.009 : 0);
+    (reducedEffects ? 0.09 : 0.078) + (motionEnabled ? Math.sin(elapsed * 2.65 + 0.6) * 0.009 : 0);
   neuralLineMaterial.opacity = THREE.MathUtils.lerp(
     neuralLineMaterial.opacity,
     0.14 * targetOpacity,
@@ -899,10 +1003,27 @@ function animate() {
 
   updateMarkers();
   renderer.render(scene, camera);
-  window.requestAnimationFrame(animate);
+  animationFrameId = window.requestAnimationFrame(animate);
 }
+
+function startAnimation() {
+  if (animationFrameId || document.hidden) return;
+  clock.getDelta();
+  animationFrameId = window.requestAnimationFrame(animate);
+}
+
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) {
+    if (animationFrameId) window.cancelAnimationFrame(animationFrameId);
+    animationFrameId = 0;
+    return;
+  }
+  startAnimation();
+});
 
 setScene("hero", true);
 resizeRenderer();
 updateMotionButton();
-animate();
+startAnimation();
+
+}
