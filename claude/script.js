@@ -17,16 +17,15 @@ const COUNT = IS_MOBILE ? 22000 : 45000;
 const STAR_COUNT = IS_MOBILE ? 700 : 1400;
 const MORPH_SECONDS = REDUCED ? 0.01 : 2.6;
 
-/* brand palette from the SoliSoul logo: forest green, terracotta, cream */
 const PALETTE = {
-  mint: new THREE.Color("#8fc9a8"), // sage green
-  blue: new THREE.Color("#7fb5a3"), // eucalyptus
-  violet: new THREE.Color("#9db48c"), // moss
-  gold: new THREE.Color("#e8c98f"), // warm sand
-  rose: new THREE.Color("#d98a68"), // soft terracotta
-  coral: new THREE.Color("#dd7d52"), // terracotta
-  white: new THREE.Color("#f7efdc"), // cream
-  deepBlue: new THREE.Color("#22392e"),
+  mint: new THREE.Color("#7de0cb"),
+  blue: new THREE.Color("#75bdea"),
+  violet: new THREE.Color("#a69af5"),
+  gold: new THREE.Color("#f7ca6b"),
+  rose: new THREE.Color("#ef86b0"),
+  coral: new THREE.Color("#f29682"),
+  white: new THREE.Color("#fff6e8"),
+  deepBlue: new THREE.Color("#2b3f68"),
 };
 
 /* section index → shape + camera preset */
@@ -313,7 +312,7 @@ try {
 let dpr = Math.min(window.devicePixelRatio || 1, IS_MOBILE ? 1.6 : 2);
 renderer.setPixelRatio(dpr);
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setClearColor(new THREE.Color("#0e1712"), 1);
+renderer.setClearColor(new THREE.Color("#04070c"), 1);
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 120);
@@ -344,9 +343,9 @@ const aurora = new THREE.Mesh(
         float t = uTime * 0.03;
         float band = sin(vDir.y * 3.0 + sin(vDir.x * 2.0 + t) + t) * 0.5 + 0.5;
         float band2 = sin(vDir.x * 2.5 - vDir.z * 2.0 - t * 1.4) * 0.5 + 0.5;
-        vec3 base = vec3(0.024, 0.038, 0.028);
-        vec3 tealGlow = vec3(0.05, 0.10, 0.06) * band;
-        vec3 violetGlow = vec3(0.12, 0.07, 0.04) * band2;
+        vec3 base = vec3(0.016, 0.027, 0.047);
+        vec3 tealGlow = vec3(0.04, 0.10, 0.10) * band;
+        vec3 violetGlow = vec3(0.08, 0.05, 0.13) * band2;
         float horizon = smoothstep(0.6, -0.4, vDir.y);
         gl_FragColor = vec4(base + (tealGlow + violetGlow) * horizon * 0.9, 1.0);
       }
@@ -393,7 +392,7 @@ scene.add(aurora);
       void main() {
         float d = length(gl_PointCoord - 0.5);
         float a = smoothstep(0.5, 0.05, d) * vTw * 0.85;
-        gl_FragColor = vec4(vec3(0.96, 0.92, 0.80), a);
+        gl_FragColor = vec4(vec3(0.85, 0.9, 1.0), a);
       }
     `,
   });
@@ -523,7 +522,7 @@ const OBSESSIONS = [
 
 const obsessionSprites = [];
 {
-  const orbitTints = ["#8fc9a8", "#9db48c", "#7fb5a3", "#d98a68", "#e8c98f"];
+  const orbitTints = ["#7de0cb", "#a69af5", "#75bdea", "#ef86b0", "#f7ca6b"];
   OBSESSIONS.forEach((word, k) => {
     const cv = document.createElement("canvas");
     cv.width = 512;
@@ -535,7 +534,7 @@ const obsessionSprites = [];
     ctx.textBaseline = "middle";
     ctx.shadowColor = tint;
     ctx.shadowBlur = 26;
-    ctx.fillStyle = "#f2ecdd";
+    ctx.fillStyle = "#f4f7ff";
     ctx.fillText(word, 256, 66);
     ctx.shadowBlur = 0;
     ctx.globalAlpha = 0.85;

@@ -3,8 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>پرسشنامه | سولی‌سول</title>
-<link rel="icon" type="image/png" href="./assets/favicon.png">
+<title>پرسشنامه</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -13,10 +12,10 @@
      CONFIG — everything you edit lives at the very top.
      ============================================================ */
   :root{
-    --bg:#0e1712; --bg-2:#0b120d; --card:#152218; --card-hover:#1a2a1e;
-    --border:#28362b; --border-soft:#202c23;
-    --text:#ece5d4; --muted:#9aa694; --faint:#66735f;
-    --accent:#8fc9a8; --accent-dim:rgba(143,201,168,.13); --accent-line:rgba(143,201,168,.35);
+    --bg:#0d1117; --bg-2:#0a0d12; --card:#161b22; --card-hover:#1b212b;
+    --border:#232a35; --border-soft:#1c222b;
+    --text:#e6edf3; --muted:#8b96a5; --faint:#5a6472;
+    --accent:#35d6c3; --accent-dim:rgba(53,214,195,.13); --accent-line:rgba(53,214,195,.35);
     --shadow:0 10px 30px -12px rgba(0,0,0,.6);
     --radius:16px;
   }
@@ -25,7 +24,7 @@
   body{
     font-family:'Vazirmatn',system-ui,sans-serif;
     background:
-      radial-gradient(1100px 500px at 80% -10%, rgba(143,201,168,.06), transparent 60%),
+      radial-gradient(1100px 500px at 80% -10%, rgba(53,214,195,.06), transparent 60%),
       linear-gradient(180deg,var(--bg),var(--bg-2));
     color:var(--text); line-height:1.85; min-height:100vh;
     -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
@@ -35,7 +34,7 @@
   header{
     position:sticky; top:0; z-index:20;
     backdrop-filter:blur(14px);
-    background:linear-gradient(180deg, rgba(14,23,18,.92), rgba(14,23,18,.72));
+    background:linear-gradient(180deg, rgba(13,17,23,.92), rgba(13,17,23,.72));
     border-bottom:1px solid var(--border-soft);
   }
   .head-inner{max-width:760px; margin:0 auto; padding:16px 20px 12px}
@@ -43,10 +42,10 @@
   .brand h1{font-size:19px; font-weight:700; margin:0; letter-spacing:-.2px}
   .brand .sub{font-size:12.5px; color:var(--faint); font-weight:400}
   .progress-row{display:flex; align-items:center; gap:12px; margin-top:12px}
-  .bar{position:relative; flex:1; height:7px; border-radius:99px; background:#1e2a22; overflow:hidden}
+  .bar{position:relative; flex:1; height:7px; border-radius:99px; background:#20262f; overflow:hidden}
   .bar > i{
     position:absolute; inset-inline-start:0; top:0; bottom:0; width:0%;
-    background:linear-gradient(90deg,var(--accent),#b9dcc4);
+    background:linear-gradient(90deg,var(--accent),#5ce6d6);
     border-radius:99px; transition:width .35s cubic-bezier(.4,0,.2,1);
   }
   .count{font-size:12.5px; color:var(--muted); font-variant-numeric:tabular-nums; white-space:nowrap; min-width:64px; text-align:center}
@@ -82,7 +81,7 @@
   .q-top{display:flex; gap:13px; align-items:flex-start; margin-bottom:15px}
   .num{
     flex:none; width:34px; height:34px; border-radius:10px;
-    background:#1b2820; border:1px solid var(--border);
+    background:#1d232d; border:1px solid var(--border);
     display:grid; place-items:center; font-size:13.5px; font-weight:600; color:var(--muted);
     font-variant-numeric:tabular-nums; transition:.2s;
   }
@@ -93,13 +92,13 @@
   .opt{
     flex:1; min-width:92px; cursor:pointer; user-select:none;
     font-family:inherit; font-size:14.5px; font-weight:500; color:var(--muted);
-    background:#121b15; border:1px solid var(--border); border-radius:12px;
+    background:#12171e; border:1px solid var(--border); border-radius:12px;
     padding:12px 8px; text-align:center; transition:.16s;
   }
-  .opt:hover{border-color:#41523f; color:var(--text)}
+  .opt:hover{border-color:#3a444f; color:var(--text)}
   .opt:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
   .opt.sel{background:var(--accent); border-color:transparent; color:#06201d; font-weight:600}
-  .opt.sel.na{background:#3a473c; color:var(--text)}
+  .opt.sel.na{background:#39424e; color:var(--text)}
 
   /* ---- submit ---- */
   .foot{margin-top:26px}
@@ -111,7 +110,7 @@
   .warn.show{display:block}
   button.submit{
     width:100%; font-family:inherit; font-size:16px; font-weight:600; color:#06201d;
-    background:linear-gradient(90deg,var(--accent),#b9dcc4); border:0; border-radius:14px;
+    background:linear-gradient(90deg,var(--accent),#5ce6d6); border:0; border-radius:14px;
     padding:16px; cursor:pointer; transition:.2s; box-shadow:var(--shadow);
   }
   button.submit:hover{filter:brightness(1.06)}
@@ -132,7 +131,7 @@
   .result-head{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:6px}
   .result-head h3{margin:0; font-size:16px; font-weight:600}
   .tally{display:flex; gap:8px; flex-wrap:wrap; font-size:12.5px; color:var(--muted)}
-  .tally span{background:#1c2a20; border:1px solid var(--border); border-radius:99px; padding:4px 11px; font-variant-numeric:tabular-nums}
+  .tally span{background:#1d232d; border:1px solid var(--border); border-radius:99px; padding:4px 11px; font-variant-numeric:tabular-nums}
   .review{list-style:none; margin:14px 0 0; padding:0; max-height:420px; overflow:auto}
   .review li{display:flex; gap:12px; align-items:flex-start; padding:11px 4px; border-bottom:1px solid var(--border-soft); font-size:14px}
   .review li:last-child{border-bottom:0}
@@ -143,7 +142,7 @@
   .ghost{margin-top:18px; width:100%; font-family:inherit; font-size:14.5px; font-weight:500; color:var(--text); background:transparent; border:1px solid var(--border); border-radius:12px; padding:12px; cursor:pointer; transition:.15s}
   .ghost:hover{border-color:var(--accent-line); color:var(--accent)}
   .ghost:disabled{opacity:.5; cursor:not-allowed}
-  .ghost.primary{color:#06201d; background:linear-gradient(90deg,var(--accent),#b9dcc4); border:0}
+  .ghost.primary{color:#06201d; background:linear-gradient(90deg,var(--accent),#5ce6d6); border:0}
   .result-actions{display:flex; gap:10px}
   .result-actions .ghost{flex:1}
   .result-actions .primary{flex:2}
@@ -172,15 +171,15 @@
   @media (prefers-reduced-motion:reduce){*{transition:none !important}}
 
   /* ---- SoliSoul 3D backdrop (same visual language as the main page) ---- */
-  html{background:#0b120d}
+  html{background:#0a0d12}
   body{background:transparent}
   #bg3d{position:fixed; inset:0; z-index:-1; width:100%; height:100%; display:block}
   .intro,.q,.result{
-    background:rgba(21,34,24,.78);
+    background:rgba(22,27,34,.78);
     backdrop-filter:blur(12px);
     -webkit-backdrop-filter:blur(12px);
   }
-  .q.answered{background:linear-gradient(var(--accent-dim),var(--accent-dim)),rgba(21,34,24,.78)}
+  .q.answered{background:linear-gradient(var(--accent-dim),var(--accent-dim)),rgba(22,27,34,.78)}
   .brand .home-link{
     font-size:12.5px; color:var(--accent); text-decoration:none; font-weight:500;
     margin-inline-start:auto; white-space:nowrap;
@@ -737,6 +736,6 @@ $("printBtn").addEventListener("click", () => window.print());
 $("submitBtn").addEventListener("click", submit);
 build();
 </script>
-<script type="module" src="./survey-bg.min.js?v=2"></script>
+<script type="module" src="./survey-bg.min.js?v=1"></script>
 </body>
 </html>
