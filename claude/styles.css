@@ -1,20 +1,17 @@
-/* SoliSoul brand palette — from the logo: forest green (balance, growth),
-   terracotta (warmth, human contact), cream (calm). */
 :root {
-  --ink: #f2ecdd;
-  --soft: #d8d2c0;
-  --muted: #97a692;
-  --deep: #0e1712;
-  --panel: rgba(17, 28, 21, 0.55);
-  --panel-strong: rgba(15, 26, 19, 0.85);
-  --mint: #8fc9a8;
-  --violet: #9db48c;
-  --gold: #e8c98f;
-  --rose: #d98a68;
-  --blue: #7fb5a3;
-  --terracotta: #dd7d52;
-  --line: rgba(242, 236, 221, 0.13);
-  --line-strong: rgba(242, 236, 221, 0.28);
+  --ink: #f4f7ff;
+  --soft: #c6cfe2;
+  --muted: #8b97b3;
+  --deep: #04070c;
+  --panel: rgba(9, 14, 24, 0.55);
+  --panel-strong: rgba(10, 16, 28, 0.82);
+  --mint: #7de0cb;
+  --violet: #a69af5;
+  --gold: #f7ca6b;
+  --rose: #ef86b0;
+  --blue: #75bdea;
+  --line: rgba(244, 247, 255, 0.13);
+  --line-strong: rgba(244, 247, 255, 0.28);
   --radius: 26px;
   --header-h: 74px;
 }
@@ -40,18 +37,8 @@ body {
 }
 
 ::selection {
-  color: #0e1712;
-  background: var(--gold);
-}
-
-.contact-logo {
-  width: 84px;
-  height: 84px;
-  border-radius: 22px;
-  margin: 0 auto 18px;
-  display: block;
-  border: 1px solid var(--line-strong);
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+  color: #060a12;
+  background: var(--mint);
 }
 
 /* ---------- canvas & overlays ---------- */
@@ -174,12 +161,15 @@ body {
 }
 
 .brand-mark {
-  width: 38px;
-  height: 38px;
+  width: 36px;
+  height: 36px;
   border-radius: 12px;
-  object-fit: cover;
+  background:
+    radial-gradient(circle at 30% 30%, var(--mint), transparent 60%),
+    radial-gradient(circle at 72% 70%, var(--violet), transparent 65%),
+    rgba(255, 255, 255, 0.06);
   border: 1px solid var(--line-strong);
-  box-shadow: 0 0 24px rgba(221, 125, 82, 0.35);
+  box-shadow: 0 0 24px rgba(125, 224, 203, 0.35);
 }
 
 .brand-copy {
@@ -398,14 +388,15 @@ h2 {
 }
 
 .btn-solid {
-  color: #14100b;
-  background: linear-gradient(90deg, var(--terracotta), #e89468);
-  box-shadow: 0 12px 34px rgba(221, 125, 82, 0.35);
+  color: #07100d;
+  color: #06110d;
+  background: linear-gradient(90deg, var(--mint), #9ee8d8);
+  box-shadow: 0 12px 34px rgba(125, 224, 203, 0.35);
 }
 
 .btn-solid:hover {
   transform: translateY(-2px);
-  box-shadow: 0 18px 44px rgba(221, 125, 82, 0.5);
+  box-shadow: 0 18px 44px rgba(125, 224, 203, 0.5);
 }
 
 .btn-ghost {
@@ -415,8 +406,8 @@ h2 {
 }
 
 .btn-ghost:hover {
-  background: rgba(143, 201, 168, 0.14);
-  border-color: var(--mint);
+  background: rgba(166, 154, 245, 0.14);
+  border-color: var(--violet);
 }
 
 .chips a {
