@@ -35,6 +35,7 @@ const SECTION_PRESETS = [
   { shape: "heart", cam: [0.0, 0.1, 5.2], look: [0, 0, 0], spin: 0.12, offX: -1.15 },
   { shape: "lotus", cam: [0.0, 0.9, 5.5], look: [0, -0.75, 0], spin: 0.14, offX: -1.15 },
   { shape: "galaxy", cam: [0.0, 2.4, 4.6], look: [0, 0, 0], spin: 0.28, offX: -1.15 },
+  { shape: "galaxy", cam: [0.0, 3.3, 3.8], look: [0, 0, 0], spin: 0.3, offX: 0.0 },
   { shape: "galaxy", cam: [0.0, 4.6, 2.6], look: [0, 0, 0], spin: 0.36, offX: 0.0 },
 ];
 
@@ -504,6 +505,65 @@ const mat = new THREE.ShaderMaterial({
 const points = new THREE.Points(geo, mat);
 group.add(points);
 
+/* ------------------------------------------------- orbiting obsessions */
+/* Obsessive thoughts circle the brain like satellites; they dissolve as
+   soon as the mind morphs into another shape (therapy at work). */
+
+const OBSESSIONS = [
+  "وسواس فکری",
+  "اضطراب",
+  "نشخوار ذهنی",
+  "ترس",
+  "نگرانی",
+  "افکار تکراری",
+  "بی‌خوابی",
+  "خودانتقادی",
+];
+
+const obsessionSprites = [];
+{
+  const orbitTints = ["#7de0cb", "#a69af5", "#75bdea", "#ef86b0", "#f7ca6b"];
+  OBSESSIONS.forEach((word, k) => {
+    const cv = document.createElement("canvas");
+    cv.width = 512;
+    cv.height = 128;
+    const ctx = cv.getContext("2d");
+    const tint = orbitTints[k % orbitTints.length];
+    ctx.font = "600 52px Tahoma, 'Segoe UI', sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.shadowColor = tint;
+    ctx.shadowBlur = 26;
+    ctx.fillStyle = "#f4f7ff";
+    ctx.fillText(word, 256, 66);
+    ctx.shadowBlur = 0;
+    ctx.globalAlpha = 0.85;
+    ctx.fillStyle = tint;
+    ctx.fillText(word, 256, 66);
+
+    const tex = new THREE.CanvasTexture(cv);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    const sprite = new THREE.Sprite(
+      new THREE.SpriteMaterial({
+        map: tex,
+        transparent: true,
+        opacity: 0,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+      })
+    );
+    sprite.scale.set(1.35, 0.34, 1);
+    sprite.userData = {
+      radius: 2.05 + (k % 4) * 0.28,
+      speed: (0.22 + (k % 3) * 0.09) * (k % 2 === 0 ? 1 : -1),
+      phase: (k / OBSESSIONS.length) * Math.PI * 2,
+      wobble: 0.55 + (k % 3) * 0.25,
+    };
+    group.add(sprite);
+    obsessionSprites.push(sprite);
+  });
+}
+
 /* -------------------------------------------------------- morph controller */
 
 let currentShape = "brain";
@@ -564,6 +624,34 @@ window.addEventListener("pointermove", (e) => {
 }, { passive: true });
 
 window.addEventListener("pointerleave", () => { pointerTargetStrength = 0; });
+
+/* drag to turn the mind: rotate the whole particle group with inertia */
+const drag = { active: false, lastX: 0, lastY: 0, velY: 0, velX: 0, idle: 0 };
+
+window.addEventListener("pointerdown", (e) => {
+  if (e.pointerType !== "mouse") return; // touch keeps native scrolling
+  if (e.target.closest("a, button, .card, .site-header, .shape-dots")) return;
+  drag.active = true;
+  drag.lastX = e.clientX;
+  drag.lastY = e.clientY;
+  drag.velY = drag.velX = 0;
+}, { passive: true });
+
+window.addEventListener("pointermove", (e) => {
+  if (!drag.active) return;
+  const dx = e.clientX - drag.lastX;
+  const dy = e.clientY - drag.lastY;
+  drag.lastX = e.clientX;
+  drag.lastY = e.clientY;
+  group.rotation.y += dx * 0.006;
+  group.rotation.x = Math.max(-0.65, Math.min(0.65, group.rotation.x + dy * 0.004));
+  drag.velY = dx * 0.006;
+  drag.velX = dy * 0.004;
+}, { passive: true });
+
+const endDrag = () => { drag.active = false; };
+window.addEventListener("pointerup", endDrag, { passive: true });
+window.addEventListener("pointercancel", endDrag, { passive: true });
 
 /* --------------------------------------------------------- section driver */
 
@@ -634,7 +722,40 @@ function tick() {
   );
   camera.lookAt(camState.look);
   group.position.x = camState.offX;
-  if (!REDUCED) group.rotation.y += camState.spin * dt;
+
+  // rotation: user drag has priority; inertia carries on, auto-spin resumes when calm
+  if (drag.active) {
+    drag.idle = 0;
+  } else {
+    group.rotation.y += drag.velY;
+    group.rotation.x = Math.max(-0.65, Math.min(0.65, group.rotation.x + drag.velX));
+    drag.velY *= 0.94;
+    drag.velX *= 0.94;
+    drag.idle += dt;
+    if (!REDUCED && drag.idle > 1.5) {
+      group.rotation.y += camState.spin * dt;
+      group.rotation.x *= 0.98; // ease the tilt back to level
+    }
+  }
+
+  // obsessive thoughts orbit the brain, dissolve for every other shape
+  {
+    const show = desiredShape === "brain" && currentShape === "brain" ? 1 : 0;
+    for (let k = 0; k < obsessionSprites.length; k++) {
+      const s = obsessionSprites[k];
+      const d = s.userData;
+      const m = s.material;
+      m.opacity += ((show ? 0.85 : 0) - m.opacity) * Math.min(1, 2.2 * dt);
+      if (m.opacity < 0.01) { s.visible = false; continue; }
+      s.visible = true;
+      const a = t * d.speed + d.phase;
+      s.position.set(
+        Math.cos(a) * d.radius,
+        Math.sin(t * d.wobble + d.phase * 2) * 0.55 + 0.15,
+        Math.sin(a) * d.radius
+      );
+    }
+  }
 
   // pointer world position on the z=0 plane (in group-local x)
   raycaster.setFromCamera(pointerNDC, camera);

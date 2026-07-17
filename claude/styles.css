@@ -410,6 +410,95 @@ h2 {
   border-color: var(--violet);
 }
 
+.chips a {
+  color: var(--mint);
+  text-decoration: none;
+}
+
+.chips a:hover {
+  text-decoration: underline;
+}
+
+/* ---------- blog ---------- */
+
+.panel-blog {
+  justify-content: center;
+}
+
+.card-blog {
+  max-width: 760px;
+  width: 100%;
+}
+
+.blog-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.blog-card {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  padding: 18px;
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.03);
+  text-decoration: none;
+  color: var(--ink);
+  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.blog-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--mint);
+  background: rgba(125, 224, 203, 0.07);
+}
+
+.blog-card h3 {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.8;
+  font-weight: 600;
+}
+
+.blog-tag {
+  justify-self: start;
+  font-size: 0.7rem;
+  padding: 3px 10px;
+  border-radius: 999px;
+  color: var(--violet);
+  border: 1px solid rgba(166, 154, 245, 0.4);
+}
+
+.blog-more {
+  font-size: 0.78rem;
+  color: var(--mint);
+}
+
+.blog-all {
+  justify-self: center;
+  display: inline-block;
+}
+
+/* ---------- contact ---------- */
+
+.contact-phone {
+  font-size: clamp(1.4rem, 3.4vw, 2rem);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  margin: 0 0 20px;
+  background: linear-gradient(90deg, var(--mint), var(--blue));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.foot a {
+  color: var(--soft);
+}
+
 .panel-contact {
   justify-content: center;
 }
