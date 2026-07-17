@@ -157,8 +157,9 @@ p {
 
 .brain-stage::before {
   background:
-    radial-gradient(circle at 26% 52%, transparent 0 12rem, rgba(5, 11, 9, 0.15) 30rem),
-    linear-gradient(180deg, rgba(5, 11, 9, 0.06), rgba(5, 11, 9, 0.4));
+    radial-gradient(circle at 34% 48%, rgba(24, 111, 255, 0.12), transparent 27rem),
+    radial-gradient(circle at 60% 52%, transparent 0 12rem, rgba(2, 15, 36, 0.18) 32rem),
+    linear-gradient(180deg, rgba(2, 15, 36, 0.04), rgba(2, 15, 36, 0.42));
 }
 
 .brain-stage::after {
@@ -176,8 +177,8 @@ p {
   height: 92vh;
   opacity: 0.19;
   background-image:
-    linear-gradient(rgba(125, 224, 203, 0.24) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(125, 224, 203, 0.24) 1px, transparent 1px);
+    linear-gradient(rgba(48, 157, 255, 0.24) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(48, 157, 255, 0.24) 1px, transparent 1px);
   background-size: 68px 68px;
   mask-image: linear-gradient(to bottom, transparent, black 22%, transparent 74%);
   transform: translateX(-50%) perspective(580px) rotateX(67deg);
@@ -193,7 +194,7 @@ p {
   justify-items: center;
   gap: 18px;
   color: var(--muted);
-  background: var(--deep);
+  background: #020f24;
   transition: opacity 600ms ease, visibility 600ms ease;
 }
 
@@ -201,10 +202,10 @@ p {
   width: 68px;
   aspect-ratio: 1;
   border: 1px solid rgba(255, 248, 237, 0.14);
-  border-top-color: var(--mint);
-  border-right-color: var(--gold);
+  border-top-color: #64e6ff;
+  border-right-color: #2685ff;
   border-radius: 50%;
-  box-shadow: 0 0 46px rgba(125, 224, 203, 0.18);
+  box-shadow: 0 0 46px rgba(38, 133, 255, 0.3);
   animation: spin 900ms linear infinite;
 }
 
