@@ -188,19 +188,47 @@ const brainSpin = new THREE.Group();
 modelPivot.add(brainSpin);
 scene.add(modelPivot);
 
-const brainMaterial = new THREE.MeshPhysicalMaterial({
-  color: 0x0755c7,
-  emissive: 0x001c7a,
-  emissiveIntensity: 0.62,
-  roughness: 0.3,
-  metalness: 0.02,
-  clearcoat: 1,
-  clearcoatRoughness: 0.12,
-  ior: 1.32,
-  thickness: 0.7,
+const brainMaterial = new THREE.ShaderMaterial({
+  uniforms: {
+    uOpacity: { value: 0.55 },
+    uPulse: { value: 0 },
+    uColor: { value: new THREE.Color(0x0755c7) },
+    uGlowColor: { value: new THREE.Color(0x88efff) },
+  },
+  vertexShader: `
+    varying vec3 vViewPosition;
+
+    void main() {
+      vec4 viewPosition = modelViewMatrix * vec4(position, 1.0);
+      vViewPosition = viewPosition.xyz;
+      gl_Position = projectionMatrix * viewPosition;
+    }
+  `,
+  fragmentShader: `
+    uniform float uOpacity;
+    uniform float uPulse;
+    uniform vec3 uColor;
+    uniform vec3 uGlowColor;
+    varying vec3 vViewPosition;
+
+    void main() {
+      vec3 normal = normalize(cross(dFdx(vViewPosition), dFdy(vViewPosition)));
+      if (!gl_FrontFacing) normal *= -1.0;
+      vec3 viewDirection = normalize(-vViewPosition);
+      vec3 lightDirection = normalize(vec3(-0.35, 0.58, 0.74));
+      float light = 0.3 + 0.7 * max(dot(normal, lightDirection), 0.0);
+      float fresnel = pow(1.0 - abs(dot(normal, viewDirection)), 2.0);
+      vec3 baseColor = uColor * light;
+      vec3 finalColor = mix(baseColor, uGlowColor, fresnel * 0.88);
+      finalColor += uGlowColor * uPulse * 0.08;
+      gl_FragColor = vec4(finalColor, (0.58 + fresnel * 0.3) * uOpacity);
+    }
+  `,
   transparent: true,
-  opacity: 0.55,
   side: THREE.DoubleSide,
+  depthWrite: true,
+  toneMapped: false,
+  extensions: { derivatives: true },
 });
 
 const brainBaseOpacity = 0.55;
@@ -211,13 +239,11 @@ const brainAuraMaterial = new THREE.ShaderMaterial({
     uEdgeColor: { value: new THREE.Color(0x9cf7ff) },
   },
   vertexShader: `
-    varying vec3 vNormal;
-    varying vec3 vViewDirection;
+    varying vec3 vViewPosition;
 
     void main() {
       vec4 viewPosition = modelViewMatrix * vec4(position, 1.0);
-      vNormal = normalize(normalMatrix * normal);
-      vViewDirection = normalize(-viewPosition.xyz);
+      vViewPosition = viewPosition.xyz;
       gl_Position = projectionMatrix * viewPosition;
     }
   `,
@@ -225,11 +251,13 @@ const brainAuraMaterial = new THREE.ShaderMaterial({
     uniform float uOpacity;
     uniform vec3 uInnerColor;
     uniform vec3 uEdgeColor;
-    varying vec3 vNormal;
-    varying vec3 vViewDirection;
+    varying vec3 vViewPosition;
 
     void main() {
-      float facing = abs(dot(normalize(vNormal), normalize(vViewDirection)));
+      vec3 normal = normalize(cross(dFdx(vViewPosition), dFdy(vViewPosition)));
+      if (!gl_FrontFacing) normal *= -1.0;
+      vec3 viewDirection = normalize(-vViewPosition);
+      float facing = abs(dot(normal, viewDirection));
       float fresnel = pow(1.0 - facing, 2.15);
       vec3 glowColor = mix(uInnerColor * 0.35, uEdgeColor * 1.6, fresnel);
       float alpha = (0.035 + fresnel * 1.2) * uOpacity;
@@ -241,6 +269,7 @@ const brainAuraMaterial = new THREE.ShaderMaterial({
   depthWrite: false,
   blending: THREE.AdditiveBlending,
   toneMapped: false,
+  extensions: { derivatives: true },
 });
 
 const sceneStates = {
@@ -552,15 +581,12 @@ let brainModel = null;
 const modelLoader = new GLTFLoader();
 
 modelLoader.load(
-  "./assets/brain.glb",
+  "./assets/brain-fast.glb",
   (gltf) => {
     brainModel = gltf.scene;
     const brainMeshes = [];
     brainModel.traverse((object) => {
       if (!object.isMesh) return;
-      if (!object.geometry.getAttribute("normal")) {
-        object.geometry.computeVertexNormals();
-      }
       object.material = brainMaterial;
       object.frustumCulled = true;
       brainMeshes.push(object);
@@ -609,7 +635,15 @@ modelLoader.load(
     loaderElement.classList.add("is-loaded");
     stage.classList.add("brain-ready");
   },
-  undefined,
+  (progressEvent) => {
+    if (!progressEvent.total) return;
+    const progress = Math.min(
+      99,
+      Math.round((progressEvent.loaded / progressEvent.total) * 100),
+    );
+    loaderElement.querySelector("p").textContent =
+      `در حال بارگذاری مغز سه‌بعدی · ${progress}٪`;
+  },
   () => {
     loaderElement.classList.add("has-error");
     loaderElement.querySelector("p").textContent = "بارگذاری مدل سه‌بعدی ناموفق بود";
@@ -652,7 +686,7 @@ function setScene(key, immediate = false) {
     modelPivot.position.copy(targetPosition);
     modelPivot.rotation.copy(targetRotation);
     modelPivot.scale.copy(targetScale);
-    brainMaterial.opacity = targetOpacity * brainBaseOpacity;
+    brainMaterial.uniforms.uOpacity.value = targetOpacity * brainBaseOpacity;
   }
 }
 
@@ -808,13 +842,14 @@ function animate() {
     brainSpin.rotation.y += delta * (activeScene === "hero" ? 0.13 : 0.045);
   }
 
-  brainMaterial.opacity = THREE.MathUtils.lerp(
-    brainMaterial.opacity,
+  brainMaterial.uniforms.uOpacity.value = THREE.MathUtils.lerp(
+    brainMaterial.uniforms.uOpacity.value,
     targetOpacity * brainBaseOpacity,
     smoothing,
   );
-  brainMaterial.emissiveIntensity =
-    0.62 + (motionEnabled ? Math.sin(elapsed * 1.35) * 0.1 : 0);
+  brainMaterial.uniforms.uPulse.value = motionEnabled
+    ? 0.5 + Math.sin(elapsed * 1.35) * 0.5
+    : 0.25;
   brainAuraMaterial.uniforms.uOpacity.value = THREE.MathUtils.lerp(
     brainAuraMaterial.uniforms.uOpacity.value,
     0.94 * targetOpacity,
