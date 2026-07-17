@@ -60,8 +60,8 @@ const aurora = new THREE.Mesh(
         float t = uTime * 0.03;
         float band = sin(vDir.y * 3.0 + sin(vDir.x * 2.0 + t) + t) * 0.5 + 0.5;
         float band2 = sin(vDir.x * 2.5 - vDir.z * 2.0 - t * 1.4) * 0.5 + 0.5;
-        vec3 tealGlow = vec3(0.04, 0.10, 0.10) * band;
-        vec3 violetGlow = vec3(0.08, 0.05, 0.13) * band2;
+        vec3 tealGlow = vec3(0.05, 0.10, 0.06) * band;
+        vec3 violetGlow = vec3(0.12, 0.07, 0.04) * band2;
         float horizon = smoothstep(0.6, -0.4, vDir.y);
         gl_FragColor = vec4((tealGlow + violetGlow) * horizon * 0.8, 0.9);
       }
@@ -109,7 +109,7 @@ let starMat;
       void main() {
         float d = length(gl_PointCoord - 0.5);
         float a = smoothstep(0.5, 0.05, d) * vTw * 0.7;
-        gl_FragColor = vec4(vec3(0.85, 0.9, 1.0), a);
+        gl_FragColor = vec4(vec3(0.96, 0.92, 0.80), a);
       }
     `,
   });
@@ -201,10 +201,10 @@ const mat = new THREE.ShaderMaterial({
       gl_Position = projectionMatrix * mv;
       gl_PointSize = aSize * uSize / max(1.0, -mv.z * 9.0);
 
-      /* anxious: violet/rose sparks — calm: mint/blue */
+      /* anxious: agitated terracotta — calm: sage green (the logo palette) */
       float h = (position.y + 1.0) * 0.5;
-      vec3 anxious = mix(vec3(0.65, 0.60, 0.96), vec3(0.94, 0.53, 0.69), fract(aSeed * 3.7));
-      vec3 calm = mix(vec3(0.49, 0.88, 0.80), vec3(0.46, 0.74, 0.92), h);
+      vec3 anxious = mix(vec3(0.87, 0.49, 0.32), vec3(0.85, 0.54, 0.41), fract(aSeed * 3.7));
+      vec3 calm = mix(vec3(0.56, 0.79, 0.66), vec3(0.50, 0.71, 0.64), h);
       vColor = mix(anxious, calm, uCalm);
       vTw = 0.5 + 0.5 * sin(uTime * (0.8 + fract(aSeed * 3.7) * 2.4) + aSeed * 90.0);
     }
