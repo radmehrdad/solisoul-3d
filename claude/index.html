@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#04070c" />
+    <title>سولی‌سول × کلود | سفر ذرات ذهن</title>
+    <meta
+      name="description"
+      content="یک تجربه‌ی سه‌بعدی کاملاً پروسیجرال: ۴۵ هزار ذره که از مغز به قلب، نیلوفر و کهکشان دگرگون می‌شوند — روایت مسیر درمان."
+    />
+    <link rel="stylesheet" href="./styles.css?v=1" />
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "../vendor/three/three.module.js",
+          "three/addons/": "../vendor/three/addons/"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">رفتن به محتوای اصلی</a>
+
+    <div id="loader" class="loader" aria-hidden="true">
+      <div class="loader-core">
+        <span class="loader-ring"></span>
+        <p class="loader-word">در حال بافتن ذرات ذهن…</p>
+        <p class="loader-pct"><span id="loader-num">0</span>٪</p>
+      </div>
+    </div>
+
+    <canvas id="scene" class="scene-canvas" aria-hidden="true"></canvas>
+    <div class="vignette" aria-hidden="true"></div>
+
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="سولی‌سول">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span class="brand-copy">
+          <strong>SoliSoul</strong>
+          <small>نسخه‌ی کلود · Particle Mind</small>
+        </span>
+      </a>
+      <nav class="site-nav" aria-label="ناوبری">
+        <a href="#mind">شناخت</a>
+        <a href="#heart">احساس</a>
+        <a href="#bloom">شکوفایی</a>
+        <a href="#calm">آرامش</a>
+      </nav>
+      <a class="header-action" href="#contact">شروع گفت‌وگو</a>
+    </header>
+
+    <nav class="shape-dots" aria-label="مراحل سفر">
+      <a href="#top" data-dot="0" class="is-active" aria-label="آغاز"><i></i><em>آغاز</em></a>
+      <a href="#mind" data-dot="1" aria-label="شناخت"><i></i><em>شناخت</em></a>
+      <a href="#heart" data-dot="2" aria-label="احساس"><i></i><em>احساس</em></a>
+      <a href="#bloom" data-dot="3" aria-label="شکوفایی"><i></i><em>شکوفایی</em></a>
+      <a href="#calm" data-dot="4" aria-label="آرامش"><i></i><em>آرامش</em></a>
+      <a href="#contact" data-dot="5" aria-label="گفت‌وگو"><i></i><em>گفت‌وگو</em></a>
+    </nav>
+
+    <main id="main-content">
+      <!-- ۰ · آغاز -->
+      <section class="panel panel-hero" id="top" data-shape="brain" data-index="0">
+        <div class="panel-inner">
+          <p class="kicker">تجربه‌ی تعاملی سلامت روان · بدون هیچ فایل مدل، همه‌چیز با ریاضیات</p>
+          <h1>
+            ذهنِ تو
+            <span class="grad">یک کهکشان</span>
+            است
+          </h1>
+          <p class="lede">
+            چهل‌وپنج هزار ذره‌ی نور، داستان یک مسیر درمانی را روایت می‌کنند: از شناختِ ذهن تا
+            رسیدن به آرامش. حرکت کن؛ ذرات با تو دگرگون می‌شوند.
+          </p>
+          <div class="hero-actions">
+            <a class="btn btn-solid" href="#mind">شروع سفر ↓</a>
+            <a class="btn btn-ghost" href="#contact">دریافت مشاوره</a>
+          </div>
+          <p class="hint" aria-hidden="true">موس را حرکت بده — ذرات به تو واکنش نشان می‌دهند</p>
+        </div>
+      </section>
+
+      <!-- ۱ · شناخت -->
+      <section class="panel" id="mind" data-shape="brain" data-index="1">
+        <div class="panel-inner card">
+          <p class="kicker">۰۱ · شناخت</p>
+          <h2>اول، ذهن را می‌بینیم</h2>
+          <p>
+            هر مسیر درمانی از مشاهده آغاز می‌شود. در جلسه‌های ارزیابی، الگوهای فکری، خاطره‌ها و
+            چرخه‌های تکرارشونده را بدون قضاوت کنار هم می‌گذاریم تا نقشه‌ی ذهن روشن شود.
+          </p>
+          <ul class="chips">
+            <li>ارزیابی ساختاریافته</li>
+            <li>مصاحبه‌ی بالینی</li>
+            <li>نقشه‌ی الگوهای فکری</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- ۲ · احساس -->
+      <section class="panel" id="heart" data-shape="heart" data-index="2">
+        <div class="panel-inner card">
+          <p class="kicker">۰۲ · احساس</p>
+          <h2>بعد، به قلب گوش می‌دهیم</h2>
+          <p>
+            احساس‌ها پیام‌اند، نه مزاحم. در فضایی امن یاد می‌گیریم خشم، اضطراب و غم را نام‌گذاری
+            کنیم و به‌جای سرکوب، با آن‌ها گفت‌وگو کنیم. درمان یعنی همین: شنیده‌شدن.
+          </p>
+          <ul class="chips">
+            <li>درمان فردی</li>
+            <li>زوج‌درمانی</li>
+            <li>تنظیم هیجان</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- ۳ · شکوفایی -->
+      <section class="panel" id="bloom" data-shape="lotus" data-index="3">
+        <div class="panel-inner card">
+          <p class="kicker">۰۳ · شکوفایی</p>
+          <h2>سپس، شکوفا می‌شویم</h2>
+          <p>
+            تغییر، ناگهانی نیست؛ گلبرگ‌به‌گلبرگ باز می‌شود. با تمرین‌های هفتگی، مهارت‌های تازه در
+            زندگی واقعی ریشه می‌دوانند — در رابطه‌ها، در کار، در نگاه به خود.
+          </p>
+          <ul class="chips">
+            <li>طرح‌واره‌درمانی</li>
+            <li>درمان شناختی–رفتاری</li>
+            <li>ذهن‌آگاهی</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- ۴ · آرامش -->
+      <section class="panel" id="calm" data-shape="galaxy" data-index="4">
+        <div class="panel-inner card">
+          <p class="kicker">۰۴ · آرامش</p>
+          <h2>و در پایان، آرامش</h2>
+          <p>
+            آرامش یعنی ذهنی که دیگر با خودش نمی‌جنگد؛ کهکشانی که در مدار خودش می‌چرخد. جلسه‌های
+            پیگیری کمک می‌کنند این مدار پایدار بماند.
+          </p>
+          <ul class="chips">
+            <li>جلسه‌های پیگیری</li>
+            <li>پیشگیری از بازگشت</li>
+            <li>مراقبت بلندمدت</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- ۵ · تماس -->
+      <section class="panel panel-contact" id="contact" data-shape="galaxy" data-index="5">
+        <div class="panel-inner card card-contact">
+          <p class="kicker">گفت‌وگو</p>
+          <h2>سفرِ تو از یک پیام شروع می‌شود</h2>
+          <p>
+            برای رزرو وقت مشاوره‌ی حضوری یا آنلاین، همین حالا پیام بده. پاسخ‌گویی در کمتر از
+            یک روز کاری.
+          </p>
+          <div class="hero-actions">
+            <a class="btn btn-solid" href="https://wa.me/0000000000" rel="noopener">واتس‌اپ</a>
+            <a class="btn btn-ghost" href="tel:+000000000">تماس تلفنی</a>
+          </div>
+          <footer class="foot">
+            <span>SoliSoul · نسخه‌ی آزمایشی ساخته‌شده با Claude</span>
+            <span>۴۵٬۰۰۰ ذره · صفر فایل سه‌بعدی · WebGL خالص</span>
+          </footer>
+        </div>
+      </section>
+    </main>
+
+    <div class="fallback" id="webgl-fallback" hidden>
+      <p>مرورگر شما WebGL را پشتیبانی نمی‌کند؛ اما محتوای صفحه همچنان در دسترس است.</p>
+    </div>
+
+    <script type="module" src="./script.js?v=1"></script>
+  </body>
+</html>
