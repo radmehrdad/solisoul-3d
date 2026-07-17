@@ -60,18 +60,16 @@ const nextFrame = () =>
   });
 
 /* --------------------------------------------------------- shape recipes */
-/* Every generator fills positions[i*3..] and colors[i*3..] for COUNT pts. */
+/* Per-particle fillers: write point i into pos/col. This lets generation
+   be chunked across frames so the page never blocks on a full shape. */
 
-function makeBrain(n) {
-  const pos = new Float32Array(n * 3);
-  const col = new Float32Array(n * 3);
-  const c = new THREE.Color();
+const _c = new THREE.Color();
 
-  const cortex = Math.floor(n * 0.86);
-  for (let i = 0; i < n; i++) {
+function fillBrain(i, n, pos, col) {
+  {
     let x, y, z;
 
-    if (i < cortex) {
+    if (i < n * 0.86) {
       // cortex: ellipsoid shell with folds + central fissure
       const u = rand(Math.PI * 2);
       const v = Math.acos(rand(1, -1));
@@ -124,28 +122,24 @@ function makeBrain(n) {
 
     // electric mind: mint → blue by height, violet synapse flecks
     const t = (y + 1) / 2;
-    c.copy(PALETTE.mint).lerp(PALETTE.blue, t);
-    if (Math.random() < 0.12) c.copy(PALETTE.violet);
-    if (Math.random() < 0.03) c.copy(PALETTE.white);
-    col[i * 3] = c.r;
-    col[i * 3 + 1] = c.g;
-    col[i * 3 + 2] = c.b;
+    _c.copy(PALETTE.mint).lerp(PALETTE.blue, t);
+    if (Math.random() < 0.12) _c.copy(PALETTE.violet);
+    if (Math.random() < 0.03) _c.copy(PALETTE.white);
+    col[i * 3] = _c.r;
+    col[i * 3 + 1] = _c.g;
+    col[i * 3 + 2] = _c.b;
   }
-  return { pos, col };
 }
 
-function makeHeart(n) {
-  // classic implicit heart: (x² + 9/4·z² + y² − 1)³ − x²·y³ − 9/80·z²·y³ = 0
-  const f = (x, y, z) => {
-    const a = x * x + 2.25 * z * z + y * y - 1;
-    return a * a * a - x * x * y * y * y - 0.1125 * z * z * y * y * y;
-  };
+// classic implicit heart: (x² + 9/4·z² + y² − 1)³ − x²·y³ − 9/80·z²·y³ = 0
+function heartF(x, y, z) {
+  const a = x * x + 2.25 * z * z + y * y - 1;
+  return a * a * a - x * x * y * y * y - 0.1125 * z * z * y * y * y;
+}
 
-  const pos = new Float32Array(n * 3);
-  const col = new Float32Array(n * 3);
-  const c = new THREE.Color();
-
-  for (let i = 0; i < n; i++) {
+function fillHeart(i, n, pos, col) {
+  const f = heartF;
+  {
     // shoot a ray from origin, bisect the surface crossing
     const u = rand(Math.PI * 2);
     const v = Math.acos(rand(1, -1));
@@ -156,7 +150,7 @@ function makeHeart(n) {
     let lo = 0, hi = 1.9;
     // ensure hi is outside
     while (f(dx * hi, dy * hi, dz * hi) < 0 && hi < 3) hi += 0.4;
-    for (let k = 0; k < 16; k++) {
+    for (let k = 0; k < 12; k++) {
       const mid = (lo + hi) / 2;
       if (f(dx * mid, dy * mid, dz * mid) < 0) lo = mid;
       else hi = mid;
@@ -170,34 +164,33 @@ function makeHeart(n) {
 
     // warm gradient: coral crown → deep rose tip, white sparks
     const g = (y + 1.1) / 2.2;
-    c.copy(PALETTE.rose).lerp(PALETTE.coral, g);
-    if (Math.random() < 0.1) c.copy(PALETTE.gold);
-    if (Math.random() < 0.02) c.copy(PALETTE.white);
-    col[i * 3] = c.r;
-    col[i * 3 + 1] = c.g;
-    col[i * 3 + 2] = c.b;
+    _c.copy(PALETTE.rose).lerp(PALETTE.coral, g);
+    if (Math.random() < 0.1) _c.copy(PALETTE.gold);
+    if (Math.random() < 0.02) _c.copy(PALETTE.white);
+    col[i * 3] = _c.r;
+    col[i * 3 + 1] = _c.g;
+    col[i * 3 + 2] = _c.b;
   }
-  return { pos, col };
 }
 
-function makeLotus(n) {
-  const pos = new Float32Array(n * 3);
-  const col = new Float32Array(n * 3);
-  const c = new THREE.Color();
+// petal rings: open angle is measured from vertical; petals curl outward
+const LOTUS_RINGS = [
+  { petals: 10, open: 0.58, curl: 0.5, len: 1.6, base: 0.28, width: 0.34, y0: -0.6, share: 0.36 },
+  { petals: 8, open: 0.36, curl: 0.34, len: 1.35, base: 0.2, width: 0.3, y0: -0.62, share: 0.3 },
+  { petals: 6, open: 0.16, curl: 0.22, len: 1.05, base: 0.13, width: 0.26, y0: -0.64, share: 0.22 },
+];
+const LOTUS_SCALE = 1.15;
 
-  // petal rings: open angle is measured from vertical; petals curl outward
-  const rings = [
-    { petals: 10, open: 0.58, curl: 0.5, len: 1.6, base: 0.28, width: 0.34, y0: -0.6, share: 0.36 },
-    { petals: 8, open: 0.36, curl: 0.34, len: 1.35, base: 0.2, width: 0.3, y0: -0.62, share: 0.3 },
-    { petals: 6, open: 0.16, curl: 0.22, len: 1.05, base: 0.13, width: 0.26, y0: -0.64, share: 0.22 },
-  ];
-  const SCALE = 1.15;
+function fillLotus(i, n, pos, col) {
+  const SCALE = LOTUS_SCALE;
+  const b0 = Math.floor(n * 0.36);
+  const b1 = b0 + Math.floor(n * 0.3);
+  const b2 = Math.floor(n * 0.88);
 
-  let i = 0;
-  for (let r = 0; r < rings.length; r++) {
-    const ring = rings[r];
-    const end = r === rings.length - 1 ? Math.floor(n * 0.88) : i + Math.floor(n * ring.share);
-    for (; i < end; i++) {
+  if (i < b2) {
+    const r = i < b0 ? 0 : i < b1 ? 1 : 2;
+    const ring = LOTUS_RINGS[r];
+    {
       const p = Math.floor(rand(ring.petals));
       const theta = (p / ring.petals) * Math.PI * 2 + r * 0.4;
 
@@ -225,36 +218,29 @@ function makeLotus(n) {
 
       // outer petals rose, inner petals violet-white toward the heart
       const g = u * 0.85 + rand(0.15);
-      c.copy(PALETTE.rose).lerp(PALETTE.violet, r / 2).lerp(PALETTE.white, g * 0.35);
-      col[i * 3] = c.r;
-      col[i * 3 + 1] = c.g;
-      col[i * 3 + 2] = c.b;
+      _c.copy(PALETTE.rose).lerp(PALETTE.violet, r / 2).lerp(PALETTE.white, g * 0.35);
+      col[i * 3] = _c.r;
+      col[i * 3 + 1] = _c.g;
+      col[i * 3 + 2] = _c.b;
     }
-  }
-
-  // golden seed pod at the heart of the flower
-  for (; i < n; i++) {
+  } else {
+    // golden seed pod at the heart of the flower
     const u = rand(Math.PI * 2);
     const v = Math.acos(rand(1, -1));
     const rr = 0.24 * Math.cbrt(rand(1));
     pos[i * 3] = rr * Math.sin(v) * Math.cos(u) * SCALE;
     pos[i * 3 + 1] = (-0.42 + rr * Math.cos(v) * 0.7) * SCALE;
     pos[i * 3 + 2] = rr * Math.sin(v) * Math.sin(u) * SCALE;
-    c.copy(PALETTE.gold).lerp(PALETTE.white, rand(0.4));
-    col[i * 3] = c.r;
-    col[i * 3 + 1] = c.g;
-    col[i * 3 + 2] = c.b;
+    _c.copy(PALETTE.gold).lerp(PALETTE.white, rand(0.4));
+    col[i * 3] = _c.r;
+    col[i * 3 + 1] = _c.g;
+    col[i * 3 + 2] = _c.b;
   }
-  return { pos, col };
 }
 
-function makeGalaxy(n) {
-  const pos = new Float32Array(n * 3);
-  const col = new Float32Array(n * 3);
-  const c = new THREE.Color();
-
+function fillGalaxy(i, n, pos, col) {
   const ARMS = 3;
-  for (let i = 0; i < n; i++) {
+  {
     let x, y, z, r;
 
     if (i < n * 0.22) {
@@ -283,15 +269,31 @@ function makeGalaxy(n) {
 
     // white-gold core → blue mid → violet rim
     const g = Math.min(1, r / 2.4);
-    if (g < 0.25) c.copy(PALETTE.white).lerp(PALETTE.gold, g / 0.25);
-    else if (g < 0.6) c.copy(PALETTE.gold).lerp(PALETTE.blue, (g - 0.25) / 0.35);
-    else c.copy(PALETTE.blue).lerp(PALETTE.violet, (g - 0.6) / 0.4);
-    if (Math.random() < 0.04) c.copy(PALETTE.mint);
-    col[i * 3] = c.r;
-    col[i * 3 + 1] = c.g;
-    col[i * 3 + 2] = c.b;
+    if (g < 0.25) _c.copy(PALETTE.white).lerp(PALETTE.gold, g / 0.25);
+    else if (g < 0.6) _c.copy(PALETTE.gold).lerp(PALETTE.blue, (g - 0.25) / 0.35);
+    else _c.copy(PALETTE.blue).lerp(PALETTE.violet, (g - 0.6) / 0.4);
+    if (Math.random() < 0.04) _c.copy(PALETTE.mint);
+    col[i * 3] = _c.r;
+    col[i * 3 + 1] = _c.g;
+    col[i * 3 + 2] = _c.b;
   }
-  return { pos, col };
+}
+
+const FILLERS = { brain: fillBrain, heart: fillHeart, lotus: fillLotus, galaxy: fillGalaxy };
+
+/* Chunked generation: fill a shape in slices, yielding to the frame loop
+   between slices so scrolling and morphing never stutter. */
+async function generateShape(name, chunk, onProgress) {
+  const pos = new Float32Array(COUNT * 3);
+  const col = new Float32Array(COUNT * 3);
+  const fill = FILLERS[name];
+  for (let i = 0; i < COUNT; ) {
+    const end = Math.min(i + chunk, COUNT);
+    for (; i < end; i++) fill(i, COUNT, pos, col);
+    if (onProgress) onProgress(i / COUNT);
+    if (i < COUNT) await nextFrame();
+  }
+  SHAPES[name] = { pos, col };
 }
 
 /* ------------------------------------------------------------- WebGL boot */
@@ -505,6 +507,7 @@ group.add(points);
 /* -------------------------------------------------------- morph controller */
 
 let currentShape = "brain";
+let desiredShape = "brain"; // may be ahead of currentShape while a shape still generates
 let morphActive = false;
 let morphStart = 0;
 
@@ -586,7 +589,7 @@ function syncSection() {
   }
   if (idx !== activeIndex) {
     activeIndex = idx;
-    morphTo(SECTION_PRESETS[idx].shape);
+    desiredShape = SECTION_PRESETS[idx].shape;
     dots.forEach((d, i) => d.classList.toggle("is-active", i === idx));
   }
 }
@@ -605,6 +608,9 @@ function tick() {
   uniforms.uTime.value = t;
   aurora.material.uniforms.uTime.value = t;
   scene.userData.stars.sMat.uniforms.uTime.value = t;
+
+  // start the pending morph as soon as its target shape exists
+  if (desiredShape !== currentShape && SHAPES[desiredShape]) morphTo(desiredShape);
 
   // morph progress
   if (morphActive) {
@@ -672,20 +678,11 @@ window.addEventListener("resize", () => {
 
 async function init() {
   const num = document.getElementById("loader-num");
-  const steps = [
-    ["brain", makeBrain],
-    ["heart", makeHeart],
-    ["lotus", makeLotus],
-    ["galaxy", makeGalaxy],
-  ];
 
-  for (let i = 0; i < steps.length; i++) {
-    const [name, fn] = steps[i];
-    await nextFrame();
-    SHAPES[name] = fn(COUNT);
-    num.textContent = String(Math.round(((i + 1) / steps.length) * 100));
-    await nextFrame();
-  }
+  // only the brain gates first paint
+  await generateShape("brain", 15000, (p) => {
+    num.textContent = String(Math.round(p * 100));
+  });
 
   // start on the brain, fully formed
   posA.array.set(SHAPES.brain.pos);
@@ -696,6 +693,12 @@ async function init() {
 
   document.getElementById("loader").classList.add("is-done");
   tick();
+
+  // the remaining shapes stream in behind the live scene, in scroll order;
+  // pending morphs fire from tick() the moment their shape is ready
+  await generateShape("heart", 4000);
+  await generateShape("lotus", 9000);
+  await generateShape("galaxy", 9000);
 }
 
 init();
