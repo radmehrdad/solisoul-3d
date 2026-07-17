@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#050b09" />
+    <title>سولی‌سول | تجربه سه‌بعدی سلامت روان</title>
+    <meta
+      name="description"
+      content="تجربه سه‌بعدی سولی‌سول برای شناخت ذهن، خدمات روان‌شناسی و شروع یک مسیر درمانی انسانی."
+    />
+    <link rel="stylesheet" href="./styles.css?v=immersive-3d-v1" />
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "./vendor/three/three.module.js",
+          "three/addons/": "./vendor/three/addons/"
+        }
+      }
+    </script>
+  </head>
+  <body data-scene="hero">
+    <a class="skip-link" href="#main-content">رفتن به محتوای اصلی</a>
+
+    <header class="site-header" aria-label="ناوبری اصلی">
+      <a class="brand" href="#top" aria-label="صفحه اصلی سولی‌سول">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span class="brand-copy">
+          <strong>SoliSoul</strong>
+          <small>روان‌شناسی بالینی</small>
+        </span>
+      </a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span class="sr-only">منو</span>
+      </button>
+      <nav id="site-nav" class="site-nav">
+        <a href="#about">درباره ما</a>
+        <a href="#services">خدمات</a>
+        <a href="#process">روش کار</a>
+        <a href="#blogs">مجله</a>
+      </nav>
+      <a class="header-action" href="#contact">
+        دریافت مشاوره
+        <span aria-hidden="true">↙</span>
+      </a>
+    </header>
+
+    <aside class="scene-nav" aria-label="بخش‌های صفحه">
+      <a href="#top" data-scene-link="hero" class="is-active"><span>آغاز</span><i></i></a>
+      <a href="#about" data-scene-link="about"><span>درباره</span><i></i></a>
+      <a href="#services" data-scene-link="services"><span>خدمات</span><i></i></a>
+      <a href="#process" data-scene-link="process"><span>مسیر</span><i></i></a>
+      <a href="#blogs" data-scene-link="blogs"><span>مجله</span><i></i></a>
+      <a href="#contact" data-scene-link="contact"><span>تماس</span><i></i></a>
+    </aside>
+
+    <div class="brain-stage hero-active" aria-label="مدل تعاملی سه‌بعدی مغز انسان">
+      <canvas id="brain-canvas" aria-hidden="true"></canvas>
+      <div class="world-grid" aria-hidden="true"></div>
+      <div id="brain-loader" class="brain-loader" role="status" aria-label="در حال بارگذاری مغز سه‌بعدی">
+        <span aria-hidden="true"></span>
+        <p>در حال ساخت جهان سه‌بعدی</p>
+      </div>
+
+      <div class="disorder-markers" aria-label="موضوعات سلامت روان">
+        <button class="disorder-marker is-active" type="button" data-disorder="anxiety">اضطراب</button>
+        <button class="disorder-marker" type="button" data-disorder="depression">افسردگی</button>
+        <button class="disorder-marker" type="button" data-disorder="ocd">وسواس</button>
+        <button class="disorder-marker" type="button" data-disorder="panic">حمله پانیک</button>
+        <button class="disorder-marker" type="button" data-disorder="sleep">اختلال خواب</button>
+        <button class="disorder-marker" type="button" data-disorder="trauma">تروما</button>
+      </div>
+
+      <div class="brain-toolbar" aria-label="کنترل مغز سه‌بعدی">
+        <button id="brain-motion" type="button" aria-label="توقف حرکت" title="توقف حرکت">
+          <span aria-hidden="true">Ⅱ</span>
+        </button>
+        <button id="brain-reset" type="button" aria-label="بازنشانی زاویه دید" title="بازنشانی زاویه دید">
+          <span aria-hidden="true">↻</span>
+        </button>
+      </div>
+
+      <div class="scene-readout" aria-hidden="true">
+        <span id="scene-number">01</span>
+        <p id="scene-name">ذهن را از زاویه‌ای تازه ببینید</p>
+      </div>
+
+      <a
+        class="brain-credit"
+        href="https://3d.nih.gov/entries/3DPX-003765"
+        target="_blank"
+        rel="noreferrer"
+      >
+        NIH 3D · CC BY-SA
+      </a>
+    </div>
+
+    <main id="main-content">
+      <section id="top" class="scene-section hero" data-scene="hero">
+        <div class="section-shell hero-layout">
+          <div class="hero-content">
+            <p class="eyebrow"><span></span> روان‌شناسی، آگاهی و آرامش</p>
+            <h1><span>ذهن تو،</span><span>یک <em>جهان</em> است.</span></h1>
+            <p class="hero-copy">
+              مغز واقعی را در فضای سه‌بعدی لمس کنید و موضوعات مهم سلامت روان را
+              روشن‌تر ببینید؛ از اضطراب و افسردگی تا وسواس، پانیک و اختلال خواب.
+            </p>
+            <div class="hero-actions">
+              <a class="button button-primary" href="#contact">
+                شروع مشاوره
+                <span aria-hidden="true">↙</span>
+              </a>
+              <a class="button button-ghost" href="#about">کشف سولی‌سول</a>
+            </div>
+            <dl class="hero-proof" aria-label="ویژگی‌های خدمات">
+              <div><dt>۱۰۰٪</dt><dd>محرمانه</dd></div>
+              <div><dt>۶</dt><dd>مسیر تخصصی</dd></div>
+              <div><dt>آنلاین</dt><dd>در دسترس</dd></div>
+            </dl>
+            <div class="brain-detail" aria-live="polite">
+              <span id="disorder-index">۰۱</span>
+              <div>
+                <h2 id="disorder-title">اضطراب</h2>
+                <p id="disorder-description">
+                  نگرانی مداوم، تنش بدنی و دشواری در آرام‌کردن ذهن می‌تواند کیفیت
+                  زندگی را کاهش دهد. ارزیابی تخصصی به شناخت الگو و مسیر درمان کمک می‌کند.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="hero-void" aria-hidden="true">
+            <span>برای چرخاندن مغز، بکشید</span>
+          </div>
+        </div>
+        <a class="scroll-cue" href="#about">
+          <span>ادامه تجربه</span>
+          <i aria-hidden="true"></i>
+        </a>
+      </section>
+
+      <section class="trust-strip" aria-label="حوزه‌های خدمات">
+        <div class="trust-track">
+          <span>مشاوره فردی</span><i></i>
+          <span>زوج‌درمانی</span><i></i>
+          <span>اضطراب و استرس</span><i></i>
+          <span>آزمون‌های روان‌شناختی</span><i></i>
+          <span>مشاوره تحصیلی</span><i></i>
+          <span>وسواس فکری</span>
+        </div>
+      </section>
+
+      <section id="about" class="scene-section about-section" data-scene="about">
+        <div class="section-shell">
+          <article class="scene-panel align-left depth-card" data-tilt>
+            <div class="panel-index"><span>01</span><i></i><small>درباره ما</small></div>
+            <p class="eyebrow"><span></span> شناخت پیش از تغییر</p>
+            <h2>جایی برای دیدن آنچه درون تو می‌گذرد.</h2>
+            <p class="lead">
+              سولی‌سول بر یک باور ساده ساخته شده است: وقتی ذهن را بهتر می‌شناسیم،
+              انتخاب‌های روشن‌تری برای زندگی می‌سازیم.
+            </p>
+            <blockquote>
+              «هدف ما حمایت از شما در کشف خود واقعی، تقویت ذهن و حرکت به‌سوی
+              زندگی آگاهانه‌تر است.»
+            </blockquote>
+            <div class="pill-row">
+              <span>گفت‌وگوی بدون قضاوت</span>
+              <span>مسیر درمان شخصی</span>
+              <span>تمرین‌های قابل اجرا</span>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section id="services" class="scene-section services-section" data-scene="services">
+        <div class="section-shell wide">
+          <header class="section-heading centered">
+            <div class="panel-index"><span>02</span><i></i><small>خدمات</small></div>
+            <p class="eyebrow"><span></span> نقشه‌ای برای هر چالش</p>
+            <h2>از یک نشانه مبهم تا یک مسیر درمان روشن.</h2>
+            <p>
+              هر خدمت یک نقطه ورود مشخص دارد؛ تا بدانید چه کمکی مناسب شماست و قدم
+              بعدی چگونه برداشته می‌شود.
+            </p>
+          </header>
+          <div class="service-grid">
+            <article class="service-card depth-card" data-tilt>
+              <span class="card-number">01</span>
+              <i class="card-orb mint" aria-hidden="true"></i>
+              <h3>مشاوره فردی</h3>
+              <p>شناخت چالش‌های عاطفی و ساختن تعادل پایدار در زندگی روزمره.</p>
+              <a href="#contact" aria-label="شروع مشاوره فردی">مشاهده مسیر <span>↙</span></a>
+            </article>
+            <article class="service-card depth-card" data-tilt>
+              <span class="card-number">02</span>
+              <i class="card-orb coral" aria-hidden="true"></i>
+              <h3>اضطراب و استرس</h3>
+              <p>شناخت چرخه نگرانی، تنظیم بدن و تقویت تاب‌آوری ذهنی.</p>
+              <a href="#contact" aria-label="شروع درمان اضطراب">مشاهده مسیر <span>↙</span></a>
+            </article>
+            <article class="service-card depth-card" data-tilt>
+              <span class="card-number">03</span>
+              <i class="card-orb gold" aria-hidden="true"></i>
+              <h3>زوج‌درمانی</h3>
+              <p>بازسازی گفت‌وگو، عبور از تعارض و تقویت پیوند عاطفی.</p>
+              <a href="#contact" aria-label="شروع زوج‌درمانی">مشاهده مسیر <span>↙</span></a>
+            </article>
+            <article class="service-card depth-card" data-tilt>
+              <span class="card-number">04</span>
+              <i class="card-orb violet" aria-hidden="true"></i>
+              <h3>وسواس فکری و عملی</h3>
+              <p>درک چرخه وسواس و تمرین پاسخ‌های ذهنی و رفتاری منعطف‌تر.</p>
+              <a href="#contact" aria-label="شروع درمان وسواس">مشاهده مسیر <span>↙</span></a>
+            </article>
+            <article class="service-card depth-card" data-tilt>
+              <span class="card-number">05</span>
+              <i class="card-orb blue" aria-hidden="true"></i>
+              <h3>مشاوره تحصیلی</h3>
+              <p>مدیریت فشار، شناخت استعدادها و طراحی برنامه‌ای واقع‌بینانه.</p>
+              <a href="#contact" aria-label="شروع مشاوره تحصیلی">مشاهده مسیر <span>↙</span></a>
+            </article>
+            <article class="service-card depth-card" data-tilt>
+              <span class="card-number">06</span>
+              <i class="card-orb rose" aria-hidden="true"></i>
+              <h3>آزمون‌های روان‌شناختی</h3>
+              <p>ارزیابی معتبر برای شناخت دقیق‌تر نقاط قوت و نیازهای درمانی.</p>
+              <a href="#contact" aria-label="درخواست آزمون روان‌شناختی">مشاهده مسیر <span>↙</span></a>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="process" class="scene-section process-section" data-scene="process">
+        <div class="section-shell">
+          <div class="process-copy align-right">
+            <div class="panel-index"><span>03</span><i></i><small>روش کار</small></div>
+            <p class="eyebrow"><span></span> سه قدم تا وضوح</p>
+            <h2>درمان، یک مسیر است؛ نه یک نسخه آماده.</h2>
+            <p>
+              تجربه شما شنیده می‌شود، الگوها با هم دیده می‌شوند و هر قدم به اندازه‌ای
+              طراحی می‌شود که در زندگی واقعی قابل اجرا باشد.
+            </p>
+          </div>
+          <ol class="process-rail align-right">
+            <li class="depth-card" data-tilt>
+              <span>01</span>
+              <div><h3>شنیدن دقیق</h3><p>تجربه عاطفی، بدنی و رابطه‌ای بدون قضاوت شنیده می‌شود.</p></div>
+            </li>
+            <li class="depth-card" data-tilt>
+              <span>02</span>
+              <div><h3>نقشه‌برداری ذهن</h3><p>الگوهای تکرارشونده به زبان روشن و قابل فهم دیده می‌شوند.</p></div>
+            </li>
+            <li class="depth-card" data-tilt>
+              <span>03</span>
+              <div><h3>تمرین و پیگیری</h3><p>تمرین‌های کوچک، مشخص و متناسب با ریتم زندگی شما طراحی می‌شوند.</p></div>
+            </li>
+          </ol>
+        </div>
+      </section>
+
+      <section id="blogs" class="scene-section blogs-section" data-scene="blogs">
+        <div class="section-shell wide">
+          <header class="section-heading align-left">
+            <div class="panel-index"><span>04</span><i></i><small>مجله</small></div>
+            <p class="eyebrow"><span></span> دانش برای زندگی روزمره</p>
+            <h2>ذهن پیچیده است؛ توضیح آن نباید پیچیده باشد.</h2>
+          </header>
+          <div class="blog-grid">
+            <article class="blog-card depth-card featured" data-tilt>
+              <div class="blog-visual anxiety" aria-hidden="true"><i></i><i></i><i></i></div>
+              <time datetime="2024-12-21">۲۱ دسامبر ۲۰۲۴</time>
+              <h3>آزمون GAD-7؛ راهی سریع برای ارزیابی اضطراب فراگیر</h3>
+              <p>یک معرفی کاربردی برای فهم نشانه‌ها و تصمیم‌گیری درباره کمک تخصصی.</p>
+              <a href="https://solisoul.com/" target="_blank" rel="noreferrer">مطالعه مقاله <span>↙</span></a>
+            </article>
+            <article class="blog-card depth-card" data-tilt>
+              <div class="blog-visual finance" aria-hidden="true"><i></i><i></i><i></i></div>
+              <time datetime="2024-12-21">۲۱ دسامبر ۲۰۲۴</time>
+              <h3>اضطراب و پول؛ وقتی نگرانی مالی به ذهن فشار می‌آورد</h3>
+              <p>نگاهی انسانی به رابطه فشار مالی و چرخه‌های فکری اضطرابی.</p>
+              <a href="https://solisoul.com/" target="_blank" rel="noreferrer">مطالعه مقاله <span>↙</span></a>
+            </article>
+            <article class="blog-card depth-card" data-tilt>
+              <div class="blog-visual care" aria-hidden="true"><i></i><i></i><i></i></div>
+              <time datetime="2024-12-20">۲۰ دسامبر ۲۰۲۴</time>
+              <h3>آیا اضطراب فراگیر همیشه به درمان نیاز دارد؟</h3>
+              <p>نشانه‌هایی که می‌گویند زمان دریافت کمک تخصصی فرا رسیده است.</p>
+              <a href="https://solisoul.com/" target="_blank" rel="noreferrer">مطالعه مقاله <span>↙</span></a>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="contact" class="scene-section contact-section" data-scene="contact">
+        <div class="section-shell contact-shell align-right">
+          <div class="contact-copy">
+            <div class="panel-index"><span>05</span><i></i><small>تماس</small></div>
+            <p class="eyebrow"><span></span> یک قدم کوچک</p>
+            <h2>لازم نیست همه پاسخ‌ها را همین حالا داشته باشید.</h2>
+            <p>
+              یک پیام کوتاه کافی است. موضوع را انتخاب کنید تا برای شروع مسیر مناسب
+              با شما تماس بگیریم.
+            </p>
+            <div class="contact-points">
+              <span><i></i> محرمانگی کامل</span>
+              <span><i></i> پاسخ‌گویی انسانی</span>
+              <span><i></i> مسیر متناسب با نیاز شما</span>
+            </div>
+          </div>
+          <form class="contact-form depth-card" action="#" method="post" data-tilt>
+            <div class="field-row">
+              <label>
+                نام و نام خانوادگی
+                <input name="name" type="text" autocomplete="name" placeholder="نام شما" />
+              </label>
+              <label>
+                ایمیل یا شماره تماس
+                <input name="contact" type="text" autocomplete="email" placeholder="راه ارتباطی" />
+              </label>
+            </div>
+            <label>
+              موضوع مشاوره
+              <select name="topic">
+                <option>اضطراب و استرس</option>
+                <option>زوج‌درمانی</option>
+                <option>وسواس فکری و عملی</option>
+                <option>مشاوره تحصیلی</option>
+                <option>آزمون روان‌شناختی</option>
+              </select>
+            </label>
+            <label>
+              پیام شما
+              <textarea name="message" rows="4" placeholder="کوتاه بنویسید؛ از همین‌جا شروع می‌کنیم."></textarea>
+            </label>
+            <button class="button button-primary" type="submit">
+              ارسال درخواست
+              <span aria-hidden="true">↙</span>
+            </button>
+            <p class="form-status" role="status" aria-live="polite"></p>
+          </form>
+        </div>
+      </section>
+
+      <section class="final-cta scene-section" data-scene="final">
+        <div class="final-panel depth-card" data-tilt>
+          <span class="brand-mark large" aria-hidden="true"></span>
+          <p class="eyebrow">SoliSoul.com</p>
+          <h2>آرامش حق شماست؛ ما کنارتان هستیم.</h2>
+          <a class="button button-primary" href="#contact">درخواست مشاوره <span>↙</span></a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <a class="brand" href="#top">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span class="brand-copy"><strong>SoliSoul</strong><small>ذهن روشن‌تر، زندگی آرام‌تر</small></span>
+      </a>
+      <p>© ۲۰۲۶ سولی‌سول · همراه سلامت روان شما</p>
+      <a href="#top">بازگشت به بالا ↑</a>
+    </footer>
+
+    <script type="module" src="./script.js?v=immersive-3d-v1"></script>
+  </body>
+</html>
