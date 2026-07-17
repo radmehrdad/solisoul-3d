@@ -581,7 +581,7 @@ let brainModel = null;
 const modelLoader = new GLTFLoader();
 
 modelLoader.load(
-  "./assets/brain-fast.glb",
+  "./assets/brain-lite.glb",
   (gltf) => {
     brainModel = gltf.scene;
     const brainMeshes = [];
