@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>پرسشنامه سرگذشت زندگی | سولی‌سول</title>
+<link rel="icon" type="image/png" href="./assets/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0e1712; --bg-2:#0b120d; --card:#152218; --border:#28362b; --border-soft:#202c23;
+    --text:#ece5d4; --muted:#9aa694; --faint:#66735f;
+    --accent:#8fc9a8; --accent-dim:rgba(143,201,168,.13); --accent-line:rgba(143,201,168,.35);
+    --shadow:0 10px 30px -12px rgba(0,0,0,.6); --radius:16px;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+  html,body{margin:0}
+  body{font-family:'Vazirmatn',system-ui,sans-serif;
+    background:radial-gradient(1100px 500px at 80% -10%, rgba(143,201,168,.06), transparent 60%),linear-gradient(180deg,var(--bg),var(--bg-2));
+    color:var(--text); line-height:1.85; min-height:100vh; -webkit-font-smoothing:antialiased}
+  header{position:sticky; top:0; z-index:20; backdrop-filter:blur(14px);
+    background:linear-gradient(180deg, rgba(14,23,18,.92), rgba(14,23,18,.72)); border-bottom:1px solid var(--border-soft)}
+  .head-inner{max-width:780px; margin:0 auto; padding:16px 20px 12px}
+  .brand{display:flex; align-items:baseline; gap:10px; flex-wrap:wrap}
+  .brand h1{font-size:19px; font-weight:700; margin:0}
+  .brand .sub{font-size:12.5px; color:var(--faint)}
+  .progress-row{display:flex; align-items:center; gap:12px; margin-top:12px}
+  .bar{position:relative; flex:1; height:7px; border-radius:99px; background:#1e2a22; overflow:hidden}
+  .bar>i{position:absolute; inset-inline-start:0; top:0; bottom:0; width:0%;
+    background:linear-gradient(90deg,var(--accent),#b9dcc4); border-radius:99px; transition:width .35s cubic-bezier(.4,0,.2,1)}
+  .count{font-size:12.5px; color:var(--muted); font-variant-numeric:tabular-nums; white-space:nowrap; min-width:64px; text-align:center}
+  .count b{color:var(--accent); font-weight:600}
+  main{max-width:780px; margin:0 auto; padding:22px 20px 40px}
+  .intro{background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:20px 22px; margin-bottom:22px; color:var(--muted); font-size:14px}
+  .demo{display:flex; gap:12px; flex-wrap:wrap; margin-bottom:22px}
+  .demo label{display:flex; flex-direction:column; gap:6px; flex:1; min-width:150px; font-size:12.5px; color:var(--muted)}
+  .demo input{font-family:inherit; font-size:14px; color:var(--text); background:var(--card); border:1px solid var(--border); border-radius:11px; padding:11px 13px; outline:none; transition:border-color .15s}
+  .demo input:focus{border-color:var(--accent-line)}
+
+  .section-h{margin:30px 0 4px; padding:0 4px; font-size:16px; font-weight:700; color:var(--accent); border-inline-start:3px solid var(--accent); padding-inline-start:12px}
+  .q{background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:18px 20px; margin-bottom:14px; transition:border-color .2s, background .2s; scroll-margin-top:120px}
+  .q.answered{border-color:var(--accent-line); background:linear-gradient(var(--accent-dim),var(--accent-dim)),var(--card)}
+  .q-label{font-size:15px; font-weight:500; margin-bottom:13px}
+  .q-label .n{color:var(--faint); font-size:12.5px; margin-inline-end:6px; font-variant-numeric:tabular-nums}
+
+  .opts{display:flex; gap:10px; flex-wrap:wrap}
+  .opt{cursor:pointer; user-select:none; font-family:inherit; font-size:14px; font-weight:500; color:var(--muted);
+    background:#121b15; border:1px solid var(--border); border-radius:12px; padding:11px 15px; text-align:center; transition:.16s; flex:0 1 auto}
+  .opt:hover{border-color:#41523f; color:var(--text)}
+  .opt:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+  .opt.sel{background:var(--accent); border-color:transparent; color:#06201d; font-weight:600}
+  .opt.scale{min-width:46px; flex:1}
+  .yn .opt{flex:1; min-width:92px}
+  .scale-labels{display:flex; justify-content:space-between; font-size:12px; color:var(--faint); margin-top:8px; padding:0 2px}
+  input.txt, textarea.txt{width:100%; font-family:inherit; font-size:14.5px; color:var(--text); background:#121b15; border:1px solid var(--border); border-radius:12px; padding:12px 14px; outline:none; transition:border-color .15s; resize:vertical}
+  input.txt:focus, textarea.txt:focus{border-color:var(--accent-line)}
+  textarea.txt{min-height:92px; line-height:1.8}
+
+  .foot{margin-top:26px}
+  .warn{display:none; margin-bottom:14px; font-size:13.5px; color:#f0c36d; background:rgba(240,195,109,.08); border:1px solid rgba(240,195,109,.25); border-radius:12px; padding:12px 15px}
+  .warn.show{display:block}
+  button.submit{width:100%; font-family:inherit; font-size:16px; font-weight:600; color:#06201d; background:linear-gradient(90deg,var(--accent),#b9dcc4); border:0; border-radius:14px; padding:16px; cursor:pointer; transition:.2s; box-shadow:var(--shadow)}
+  button.submit:hover{filter:brightness(1.06)}
+  button.submit:disabled{opacity:.45; cursor:not-allowed; filter:none}
+
+  .done{display:none; text-align:center; padding:70px 20px}
+  .done.show{display:block}
+  .done .check{width:74px; height:74px; margin:0 auto 22px; border-radius:50%; background:var(--accent-dim); border:1px solid var(--accent-line); display:grid; place-items:center; color:var(--accent); font-size:34px}
+  .done h2{font-size:22px; margin:0 0 8px}
+  .done p{color:var(--muted); margin:0}
+  .result{text-align:start; margin-top:32px; background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:20px 22px}
+  .result h3{margin:0 0 12px; font-size:16px; font-weight:600}
+  .review{list-style:none; margin:0; padding:0; max-height:440px; overflow:auto}
+  .review li{padding:11px 4px; border-bottom:1px solid var(--border-soft); font-size:14px}
+  .review li:last-child{border-bottom:0}
+  .review .rq{color:var(--muted); margin-bottom:3px}
+  .review .ra{color:var(--accent); font-weight:600}
+  .review .ra.empty{color:var(--faint); font-weight:400}
+  .review .sec{color:var(--accent); font-weight:700; padding-top:6px; border-bottom:0}
+  .ghost{margin-top:18px; width:100%; font-family:inherit; font-size:14.5px; font-weight:500; color:var(--text); background:transparent; border:1px solid var(--border); border-radius:12px; padding:12px; cursor:pointer; transition:.15s}
+  .ghost:hover{border-color:var(--accent-line); color:var(--accent)}
+  .ghost:disabled{opacity:.5; cursor:not-allowed}
+  .ghost.primary{color:#06201d; background:linear-gradient(90deg,var(--accent),#b9dcc4); border:0}
+  .result-actions{display:flex; gap:10px}
+  .result-actions .primary{flex:2} .result-actions .ghost{flex:1}
+  #pdfSheet{position:fixed; inset-inline-start:-99999px; top:0; width:794px; background:#fff; color:#14181d; padding:40px 44px; font-family:'Vazirmatn',sans-serif; direction:rtl}
+  #pdfSheet .p-h{font-size:22px; font-weight:700; margin:0 0 4px}
+  #pdfSheet .p-sub{font-size:13px; color:#66735f; margin:0 0 18px}
+  #pdfSheet .p-sec{font-size:15px; font-weight:700; color:#2f7d5f; margin:16px 0 4px}
+  #pdfSheet .p-row{padding:8px 0; border-bottom:1px solid #eceff3; font-size:14px; line-height:1.7}
+  #pdfSheet .p-q{color:#555} #pdfSheet .p-a{color:#14181d; font-weight:700}
+  #pdfSheet .p-a.empty{color:#9aa5b1; font-weight:400}
+  @media print{header,.foot,.result-actions{display:none !important} body{background:#fff; color:#111}}
+  @media (max-width:520px){.head-inner,main{padding-left:15px; padding-right:15px}}
+  @media (prefers-reduced-motion:reduce){*{transition:none !important}}
+
+  /* ---- SoliSoul 3D backdrop (matches main site) ---- */
+  html{background:#0b120d}
+  body{background:transparent}
+  #bg3d{position:fixed; inset:0; z-index:-1; width:100%; height:100%; display:block}
+  .intro,.q,.result{background:rgba(21,34,24,.78); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px)}
+  .q.answered{background:linear-gradient(var(--accent-dim),var(--accent-dim)),rgba(21,34,24,.78)}
+  .brand .home-link{font-size:12.5px; color:var(--accent); text-decoration:none; font-weight:500; margin-inline-start:auto; white-space:nowrap}
+  .brand .home-link:hover{text-decoration:underline}
+  @media print{#bg3d{display:none !important}}
+</style>
+</head>
+<body>
+<canvas id="bg3d" aria-hidden="true"></canvas>
+<header>
+  <div class="head-inner">
+    <div class="brand"><h1 id="title">پرسشنامه</h1><span class="sub" id="subtitle"></span><a class="home-link" href="./">← بازگشت به سولی‌سول</a></div>
+    <div class="progress-row">
+      <div class="bar"><i id="barFill"></i></div>
+      <div class="count"><b id="doneN">۰</b> / <span id="totalN">۰</span></div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div id="formArea">
+    <div class="intro" id="intro"></div>
+    <div class="demo">
+      <label>نام<input id="firstName" type="text" autocomplete="given-name" placeholder="نام"></label>
+      <label>نام خانوادگی<input id="lastName" type="text" autocomplete="family-name" placeholder="نام خانوادگی"></label>
+    </div>
+    <div id="items"></div>
+    <div class="foot">
+      <div class="warn" id="warn"></div>
+      <button class="submit" id="submitBtn">ثبت پاسخ‌ها</button>
+    </div>
+  </div>
+
+  <div class="done" id="done">
+    <div class="check">✓</div>
+    <h2>پاسخ‌های شما ثبت شد</h2>
+    <p id="doneName">از همکاری شما سپاسگزاریم.</p>
+    <div class="result">
+      <h3>خلاصهٔ پاسخ‌های شما</h3>
+      <ul class="review" id="review"></ul>
+      <div class="result-actions">
+        <button class="ghost primary" id="pdfBtn">دانلود PDF</button>
+        <button class="ghost" id="printBtn">چاپ</button>
+      </div>
+    </div>
+  </div>
+  <div id="pdfSheet" aria-hidden="true"></div>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+const SURVEY = {
+  formspree : "https://formspree.io/f/mojorona",
+  title     : "پرسشنامه چندوجهی سرگذشت زندگی",
+  subtitle  : "طرحواره درمانی — فرم کامل پیوست اول",
+  intro     : "هدف این پرسشنامه دستیابی به تصویری جامع از زندگی شماست. اطلاعات شما کاملاً محرمانه است.",
+  requireAll: false,
+  storageKey: "lifehistory_full_v1",
+
+  items: [
+    { type:"section", label:"۱. اطلاعات کلی" },
+    { type:"text", id:"address", label:"آدرس" },
+    { type:"text", id:"phone_home", label:"شماره تلفن منزل" },
+    { type:"text", id:"phone_mobile", label:"شماره تلفن همراه" },
+    { type:"text", id:"age", label:"سن" },
+    { type:"text", id:"phone_work", label:"شماره تلفن محل کار" },
+    { type:"text", id:"job", label:"شغل" },
+    { type:"text", id:"referred_by", label:"از طرف چه کسی به این کلینیک معرفی شدید؟" },
+    { type:"single", id:"marital", label:"وضعیت تأهل", options:["مجرد","متأهل","مطلقه","ازدواج مجدد","دوران نامزدی"] },
+    { type:"single", id:"housing", label:"نوع منزل", options:["شخصی","استیجاری"] },
+
+    { type:"section", label:"۲. مشکلات فعلی" },
+    { type:"textarea", id:"current_problems", label:"مشکلات فعلی خود را بنویسید" },
+    { type:"single", id:"problem_severity", label:"شدت مشکل یا مشکلات شما چقدر است؟", options:[
+      "مشکلات تا حدودی باعث ناراحتی شما شده اند.",
+      "مشکلات به شدت باعث ناراحتی شما شده اند.",
+      "مشکلات، خیلی زیاد باعث ناراحتی شما شده اند.",
+      "مشکلات شما را از پای درآورده اند."
+    ] },
+    { type:"text", id:"problem_onset", label:"مشکلات شما از کی شروع شدند؟" },
+    { type:"textarea", id:"problem_triggers", label:"درست زمانی که دچار مشکل شدید چه اتفاقاتی در زندگی شما رخ داد که فکر می کنید در ایجاد مشکل شما نقش داشته اند؟" },
+    { type:"textarea", id:"problem_solutions", label:"برای حل مشکل خود از چه راه حلهایی استفاده کردید و کدام راه حل ها مفید بودند؟" },
+    { type:"yesno", id:"prev_psych", label:"آیا قبل از این که به این کلینیک بیایید به روان شناس، روان پزشک یا مشاور مراجعه کردید؟" },
+    { type:"textarea", id:"prev_psych_details", label:"اگر مراجعه کردید، لطفاً نوع اقدامات آنها و میزان تأثیر آنها را بنویسید" },
+
+    { type:"section", label:"۳. سابقه شخصی و اجتماعی" },
+    { type:"text", id:"birth_date", label:"۳-۱) تاریخ تولد" },
+    { type:"text", id:"brothers_count", label:"۳-۲) تعداد برادر (برادران)" },
+    { type:"text", id:"sisters_count", label:"۳-۳) تعداد خواهر (خواهران)" },
+    { type:"text", id:"birth_order", label:"۳-۴) فرزند چندم خانواده هستید؟" },
+    { type:"yesno", id:"father_alive", label:"۳-۵) آیا پدرتان در قید حیات است؟" },
+    { type:"text", id:"father_age", label:"۳-۶) اگر پدرتان زنده است سن ایشان چقدر است؟" },
+    { type:"text", id:"father_death_age", label:"۳-۷) اگر پدرتان فوت شده اند زمان مرگ ایشان شما چند سال داشتید؟" },
+    { type:"text", id:"father_death_cause", label:"۳-۸) علت مرگ پدرتان چه بود؟" },
+    { type:"text", id:"father_job", label:"۳-۹) شغل پدر و سطح تحصیلات پدر" },
+    { type:"yesno", id:"mother_alive", label:"۳-۱۰) آیا مادرتان در قید حیات است؟" },
+    { type:"text", id:"mother_age", label:"۳-۱۱) اگر مادرتان زنده است سن ایشان چقدر است؟" },
+    { type:"text", id:"mother_death_age", label:"۳-۱۲) اگر مادرتان فوت شده اند زمان مرگ ایشان شما چند سال داشتید؟" },
+    { type:"text", id:"mother_death_cause", label:"۳-۱۳) علت مرگ مادرتان چه بود؟" },
+    { type:"text", id:"mother_job", label:"۳-۱۴) شغل مادر و سطح تحصیلات مادر" },
+    { type:"text", id:"own_education", label:"۳-۱۵) سطح تحصیلات خودتان" },
+    { type:"textarea", id:"school_strengths_weaknesses", label:"۳-۱۶) نقاط ضعف و قوت دوران تحصیل خود را بنویسید" },
+    { type:"multi", id:"childhood_desc", label:"۳-۱۷) توصیف کننده دوران بچگی شما (چند مورد)", options:[
+      "بچه ای که شاد و خندان بود", "بچه ای که غمگین و ناراحت بود", "بچه ای که مشکلات درسی داشت",
+      "بچه ای که مشکلات خانوادگی داشت", "بچه ای که بیماری جسمی داشت", "بچه ای که مشکلات عاطفی داشت"
+    ] },
+    { type:"multi", id:"teen_desc", label:"۳-۱۸) توصیف کننده دوران نوجوانی شما (چند مورد)", options:[
+      "نوجوانی که شاد و خندان بود", "نوجوانی که غمگین و ناراحت بود", "نوجوانی که مشکلات درسی داشت",
+      "نوجوانی که مشکلات خانوادگی داشت", "نوجوانی که بیماری جسمی داشت", "نوجوانی که مشکلات عاطفی و رفتاری داشت",
+      "نوجوانی که با معلمان درگیر می شد", "نوجوانی که گوشه گیر و منزوی بود", "نوجوانی که دوست صمیمی نداشت", "نوجوانی که با مذهب مشکل داشت"
+    ] },
+    { type:"text", id:"current_occupation", label:"۳-۱۹) در حال حاضر مشغول چه کاری هستید؟" },
+    { type:"textarea", id:"jobs_changed", label:"۳-۲۰) از زمانی که مشغول به کار شدید چه شغلهایی را عوض کردید؟" },
+    { type:"yesno", id:"job_satisfaction", label:"۳-۲۱) آیا از شغل فعلی خود راضی هستید؟ (اگر خیر دلیل را بنویسید)" },
+    { type:"yesno", id:"balanced_budget", label:"۳-۲۲) آیا دخل و خرج شما مساوی است؟" },
+    { type:"yesno", id:"financial_straits", label:"۳-۲۳) آیا از نظر مالی در مضیغه هستید؟" },
+    { type:"textarea", id:"past_ambitions", label:"۳-۲۴) بلندپروازیهای گذشته شما چی بودند؟" },
+    { type:"textarea", id:"future_ambitions", label:"۳-۲۵) بلندپروازیهای آینده شما چی هستند؟" },
+    { type:"text", id:"height", label:"۳-۲۶) قد شما چند سانتیمتر است؟" },
+    { type:"text", id:"weight", label:"۳-۲۷) وزن شما چقدر است؟" },
+    { type:"yesno", id:"psych_hospitalized", label:"۳-۲۸) آیا تا به حال به خاطر مشکلات روانشناختی در بیمارستان بستری شده اید؟" },
+    { type:"yesno", id:"suicide_thought", label:"۳-۲۹) آیا تا به حال به خودکشی فکر کرده اید؟" },
+    { type:"yesno", id:"suicide_attempt", label:"۳-۳۰) آیا تا به حال برای خودکشی اقدام کرده اید؟" },
+    { type:"yesno", id:"family_suicide", label:"۳-۳۱) آیا کسی از اعضای خانواده شما یا بستگان نزدیکتان دست به خودکشی زده است؟" },
+    { type:"yesno", id:"family_psych_hosp", label:"۳-۳۲) آیا کسی از اعضای خانواده شما به خاطر تشنج و افسردگی یا سایر مشکلات روانی در بیمارستان بستری شده است؟" },
+    { type:"yesno", id:"legal_issues", label:"۳-۳۳) آیا تا به حال به خاطر مسایل قانونی پای شما به دادگاه یا کلانتری یا زندان کشیده شده است؟" },
+
+    { type:"section", label:"۴. رفتار" },
+    { type:"multi", id:"behaviors_list", label:"۴-۱) کدامیک از رفتارهای زیر به شما ربط دارند؟", options:[
+      "پرخوری", "ناتوانی در نگهداشتن یک شغل", "وسواس های عملی", "اقدام به خودکشی", "مصرف خودسرانه دارو",
+      "بی خوابی", "سیگار کشیدن", "نسنجیده عمل کردن", "کناره گیری از دیگران", "مشروب نوشیدن",
+      "مشکلات خوردن", "از دست دادن کنترل", "رفتار عجیب و غریب", "تنبلی", "تیک های عصبی",
+      "مشکل در تمرکز حواس", "به تعویق انداختن کارها", "زود به گریه افتادن", "اجتناب از موقعیتها",
+      "بیش از حد کار کردن", "رفتار پرخاشگرانه", "مشکل در خواب", "واکنشهای تکانشی", "اوقات تلخی"
+    ] },
+    { type:"textarea", id: "beh_change", label:"۴-۲) آیا رفتار یا عمل خاصی هست که شما دوست داشته باشید آن را تغییر بدهید؟" },
+    { type:"textarea", id: "beh_strengths", label:"۴-۳) چه مهارت ها یا ویژگیهایی دارید که به آنها افتخار میکنید؟" },
+    { type:"text", id: "beh_more", label:"۴-۴) دوست دارید چه کاری را بیشتر انجام دهید؟" },
+    { type:"text", id: "beh_less", label:"۴-۵) دوست دارید چه کاری را کمتر انجام دهید؟" },
+    { type:"text", id: "beh_start", label:"۴-۶) دوست دارید چه کاری را شروع کنید؟" },
+    { type:"text", id: "beh_stop", label:"۴-۷) دوست دارید چه کاری را متوقف کنید؟" },
+    { type:"text", id: "beh_free_time", label:"۴-۸) چقدر وقت آزاد دارید؟" },
+    { type:"yesno", id: "beh_meaningless", label:"۴-۹) آیا میتوانید خودتان را از شر کارهای بی معنی و مزخرف خلاص کنید؟" },
+    { type:"yesno", id: "beh_relaxation", label:"۴-۱۰) آیا روشهای آرام بخش مثل یوگا را هر روز اجرا میکنید؟" },
+
+    { type:"section", label:"۵. احساسات" },
+    { type:"multi", id: "emotions_list", label:"۵-۱) کدامیک از احساسهای زیر به شما ربط دارند؟", options:[
+      "خشم", "احساس گناه", "غمگین", "دلخور", "شاد", "ناراحت", "تعارف", "خسته",
+      "بی قرار", "افسرده", "متأسف", "مضطرب", "امیدوار", "ترسناک", "ناامید",
+      "تنها", "رضایت خاطر", "برانگیخته", "وحشت زده", "درمانده", "خوش بین",
+      "پرانرژی", "راحت", "تنش", "غبطه", "حسود", "نفرت"
+    ] },
+    { type:"textarea", id: "fears_list", label:"۵-۲) پنج مورد از ترسهای مهم خود را بنویسید" },
+    { type:"text", id: "emotions_more", label:"۵-۳) چه احساسهایی را بیشتر دوست دارید تجربه کنید؟" },
+    { type:"text", id: "emotions_less", label:"۵-۴) چه احساسهایی کمتر دوست دارید تجربه کنید؟" },
+    { type:"text", id: "positive_emotions_recent", label:"۵-۵) اخیراً چه احساسهای مثبتی را تجربه کرده اید؟" },
+    { type:"textarea", id: "emotions_uncontrolled", label:"۵-۶) در چه موقعیتهایی نمی توانید احساسهای خود را کنترل کنید؟" },
+    { type:"textarea", id: "emotions_peace", label:"۵-۷) در چه موقعیتهایی احساس راحتی و آرامش میکنید؟" },
+    { type:"textarea", id: "complete_sentences_feel", label:"۵-۸) جملات را تکمیل کنید (الان احساس میکنم... / وقتی احساس غرور میکنم که... / اگر نمی ترسیدم ممکن بود... و...)" },
+    { type:"textarea", id: "enjoyable_activities", label:"۵-۹) از چه کارهایی لذت میبرید و آنها را به عنوان کار لذتبخش انجام می دهید؟" },
+    { type:"yesno", id: "weekend_trouble", label:"۵-۱۰) آیا در کسب لذت و آرامش ناشی از تعطیلات آخر هفته یا مرخصی ها مشکل دارید؟ (اگر بلی توضیح دهید)" },
+
+    { type:"section", label:"۶. احساسهای بدنی" },
+    { type:"multi", id: "body_sensations", label:"۶-۱) کدامیک از احساسهای بدنی زیر به شما ربط دارند؟", options:[
+      "سردرد", "سرگیجه", "درد معده", "مشکلات دیداری", "تپش قلب", "مشکلات پوستی",
+      "گرفتگی عضلانی", "تیک", "مشکلات شنیداری", "خستگی", "خشکی دهان", "آشفتگی در خواب",
+      "تنش", "کمر درد", "ناتوانی در آرامش", "درد سینه", "لرزش", "کرختی"
+    ] },
+
+    { type:"section", label:"۷. تصاویر ذهنی" },
+    { type:"multi", id: "mental_images", label:"۷-۱) کدامیک از تصاویر ذهنی زیر به شما ربط دارند؟", options:[
+      "تصاویر ذهنی ناخوشایند جنسی", "تصاویر ذهنی لذتبخش جنسی", "تصاویر ذهنی ناخوشایند دوران کودکی",
+      "تصاویر ذهنی حاکی از تنهایی", "تصاویر ذهنی حاکی از درماندگی", "تصاویر ذهنی حاکی از پرخاشگری",
+      "تصاویر ذهنی حاکی از اغواگری جنسی", "تصاویر ذهنی حاکی از دوست داشته شدن"
+    ] },
+    { type:"multi", id: "self_image", label:"۷-۲) چه تصویری از خودتان در ذهن شما نقش بسته است؟", options:[
+      "آسیب دیده", "آسیب زننده به دیگران", "درمانده", "ناتوان در برابر مشکلات", "موفق",
+      "فاقد کنترل", "اجتماعی و بشاش", "شکست خورده", "دنباله رو", "گیر افتاده", "مورد تمسخر قرار گرفته"
+    ] },
+    { type:"textarea", id: "mental_images_details", label:"۷-۳) سایر تصاویر ذهنی، خیال‌پردازی‌های لذت‌بخش و ناخوشایند، و مکان امن" },
+
+    { type:"section", label:"۸. افکار" },
+    { type:"multi", id: "thoughts_list", label:"۸-۱) کدامیک از افکار زیر به شما ربط دارند؟", options:[
+      "من فردی بی ارزش، بی کفایت و نالایق هستم.",
+      "من فردی دیوانه، خطرناک و شیطان صفت هستم.",
+      "زندگی بی ارزش، بی معنی و بی محتواست.",
+      "خیلی اشتباه میکنم و هیچ کاری درست از آب در نمی آید."
+    ] },
+    { type:"multi", id: "words_describe_self", label:"۸-۲) خودتان را در قالب چه کلماتی توصیف می‌کنید؟", options:[
+      "حواسپرت", "با ارزش", "شیطان صفت", "دیوانه", "با ملاحظه", "صادق", "باهوش",
+      "با اعتماد به نفس", "بی فایده", "جاه طلب", "جذاب", "منحرف", "دوست نداشتنی",
+      "حساس", "زشت", "بی کفایت", "قابل اعتماد", "بلاتکلیف", "بی ارزش", "آدم معمولی",
+      "گیج", "سخت کوش", "پشیمان", "شوخ طبع"
+    ] },
+    { type:"yesno", id: "overwhelmed_thoughts", label:"۸-۳) آیا تا به حال پیش آمده به علت فراوانی افکار خاصی که به ذهن شما خطور می کند، کلافه شوید؟" },
+    { type:"textarea", id: "expectations_treatment", label:"۸-۵ تا ۸-۱۰) انتظارات از درمان، مدت زمان درمان، ویژگی‌های درمانگر ایده‌آل و تکمیل جملات (آدمی هستم که... / تمام زندگی من...)" },
+
+    { type:"section", label:"۹. روابط بین فردی" },
+    { type:"textarea", id: "family_relationships", label:"۹-۱) خانواده اصلی (شخصیت خود و والدین، انضباط خانه، حال و هوای عاطفی، احترام و محبت)" },
+    { type:"textarea", id: "friends_social", label:"۹-۲) دوستان و روابط اجتماعی (دوست‌یابی، صمیمیت، صراحت، رابطه قبل از ازدواج)" },
+    { type:"textarea", id: "marriage_info", label:"۹-۳) ازدواج (نامزدی، همسر، اشتراک و اختلاف نظر، فرزندان و مشکلاتشان)" },
+    { type:"textarea", id: "other_social", label:"۹-۴) سایر روابط اجتماعی، مشکلات همکاران و تکمیل جملات مرتبط" },
+
+    { type:"section", label:"۱۰. عوامل زیستی" },
+    { type:"yesno", id: "physical_issue", label:"۱۰-۱) آیا مشکل جسمی خاصی دارید؟ (اگر بلی نام ببرید)" },
+    { type:"yesno", id: "medication_6m", label:"۱۰-۲) آیا از طی شش ماه گذشته داروی خاصی مصرف کرده اید؟" },
+    { type:"text", id: "medication_names", label:"۱۰-۳) نام دارو را بنویسید" },
+    { type:"multi", id: "family_medical_history", label:"۱۰-۴) سابقه مشکلات پزشکی در خود یا خانواده:", options:[
+      "مشکل تیروئید", "مشکلات پوستی", "بیماری عفونی", "دیابت", "تشنج",
+      "آسم", "سرطان", "زخم معده", "میگرن"
+    ] },
+
+    { type:"section", label:"۱۱. تاریخچه زندگی" },
+    { type:"textarea", id: "history_birth_5", label:"۱۱-۲) تولد تا ۵ سالگی (خاطرات و تجارب مهم)" },
+    { type:"textarea", id: "history_6_10", label:"۱۱-۳) ۶ تا ۱۰ سالگی" },
+    { type:"textarea", id: "history_11_15", label:"۱۱-۴) ۱۱ تا ۱۵ سالگی" },
+    { type:"textarea", id: "history_16_20", label:"۱۱-۵) ۱۶ تا ۲۰ سالگی" },
+    { type:"textarea", id: "history_21_25", label:"۱۱-۶) ۲۱ تا ۲۵ سالگی" },
+    { type:"textarea", id: "history_26_30", label:"۱۱-۷) ۲۶ تا ۳۰ سالگی" },
+    { type:"textarea", id: "history_31_35", label:"۱۱-۸) ۳۱ تا ۳۵ سالگی" },
+    { type:"textarea", id: "history_36_40", label:"۱۱-۹) ۳۵ تا ۴۰ سالگی" },
+    { type:"textarea", id: "history_41_45", label:"۱۱-۱۰) ۴۱ تا ۴۵ سالگی" },
+    { type:"textarea", id: "history_46_50", label:"۱۱-۱۱) ۴۶ تا ۵۰ سالگی" },
+    { type:"textarea", id: "history_51_55", label:"۱۱-۱۲) ۵۱ تا ۵۵ سالگی" },
+    { type:"textarea", id: "history_56_60", label:"۱۱-۱۳) ۵۶ تا ۶۰ سالگی" },
+    { type:"textarea", id: "history_above_60", label:"۱۱-۱۴) پس از ۶۰ سالگی" }
+  ]
+};
+
+const fa = n => String(n).replace(/\d/g, d => "۰۱۲۳۴۵۶۷۸۹"[d]);
+const $  = id => document.getElementById(id);
+const answers = {};
+let counter = 0;
+
+document.title = SURVEY.title;
+$("title").textContent = SURVEY.title;
+$("subtitle").textContent = SURVEY.subtitle || "";
+$("intro").textContent = SURVEY.intro || "";
+
+const answerable = SURVEY.items.filter(it => it.type !== "section" && it.id);
+$("totalN").textContent = fa(answerable.length);
+
+const store = {
+  get(){ try{ return SURVEY.storageKey ? JSON.parse(localStorage.getItem(SURVEY.storageKey)||"{}") : {}; }catch(e){ return {}; } },
+  set(v){ try{ if(SURVEY.storageKey) localStorage.setItem(SURVEY.storageKey, JSON.stringify(v)); }catch(e){} },
+  clear(){ try{ if(SURVEY.storageKey) localStorage.removeItem(SURVEY.storageKey); }catch(e){} }
+};
+
+function isAnswered(it){
+  const v = answers[it.id];
+  if(it.type === "multi") return Array.isArray(v) && v.length > 0;
+  if(it.type === "text" || it.type === "textarea") return typeof v === "string" && v.trim() !== "";
+  return v != null && v !== "";
+}
+
+function build(){
+  const wrap = $("items");
+  const saved = store.get();
+
+  SURVEY.items.forEach(it => {
+    if(it.type === "section"){
+      const h = document.createElement("div");
+      h.className = "section-h"; h.textContent = it.label;
+      wrap.appendChild(h);
+      return;
+    }
+    counter++;
+    const n = counter;
+    const card = document.createElement("section");
+    card.className = "q"; card.id = "card_" + it.id;
+
+    const lab = document.createElement("div");
+    lab.className = "q-label";
+    lab.innerHTML = `<span class="n">${fa(n)}.</span>${it.label}`;
+    card.appendChild(lab);
+
+    if(it.type === "text" || it.type === "textarea"){
+      const el = document.createElement(it.type === "text" ? "input" : "textarea");
+      el.className = "txt"; if(it.type==="text") el.type="text";
+      el.addEventListener("input", () => setVal(it, el.value));
+      card.appendChild(el);
+      if(saved[it.id]){ el.value = saved[it.id]; setVal(it, saved[it.id], true); }
+
+    } else if(it.type === "yesno" || it.type === "single"){
+      const opts = it.type === "yesno" ? ["بلی","خیر"] : it.options;
+      const row = document.createElement("div");
+      row.className = "opts" + (it.type==="yesno" ? " yn" : "");
+      opts.forEach(o => {
+        const b = mkBtn(o, "opt");
+        b.addEventListener("click", () => {
+          setVal(it, o);
+          row.querySelectorAll(".opt").forEach(x=>x.classList.remove("sel"));
+          b.classList.add("sel"); markCard(it);
+        });
+        row.appendChild(b);
+      });
+      card.appendChild(row);
+      if(saved[it.id] != null){
+        const b = [...row.children].find(x => x.textContent === saved[it.id]);
+        if(b){ b.classList.add("sel"); setVal(it, saved[it.id], true); markCard(it); }
+      }
+
+    } else if(it.type === "multi"){
+      const row = document.createElement("div"); row.className = "opts";
+      answers[it.id] = Array.isArray(saved[it.id]) ? saved[it.id].slice() : [];
+      it.options.forEach(o => {
+        const b = mkBtn(o, "opt");
+        if(answers[it.id].includes(o)) b.classList.add("sel");
+        b.addEventListener("click", () => {
+          const arr = answers[it.id];
+          const i = arr.indexOf(o);
+          if(i>=0){ arr.splice(i,1); b.classList.remove("sel"); }
+          else{ arr.push(o); b.classList.add("sel"); }
+          setVal(it, arr); markCard(it);
+        });
+        row.appendChild(b);
+      });
+      card.appendChild(row);
+      if(answers[it.id].length) markCard(it);
+    }
+    wrap.appendChild(card);
+  });
+  updateProgress();
+}
+
+function mkBtn(txt, cls){ const b=document.createElement("button"); b.type="button"; b.className=cls; b.textContent=txt; return b; }
+function markCard(it){ const c=$("card_"+it.id); if(c) c.classList.toggle("answered", isAnswered(it)); }
+function setVal(it, val, silent){ answers[it.id]=val; markCard(it); if(!silent){ store.set(answers); } updateProgress(); }
+
+function updateProgress(){
+  const n = answerable.filter(isAnswered).length;
+  $("doneN").textContent = fa(n);
+  $("barFill").style.width = (answerable.length ? n/answerable.length*100 : 0) + "%";
+}
+
+function fmt(it){
+  const v = answers[it.id];
+  if(it.type === "multi") return (Array.isArray(v)&&v.length) ? v.join("، ") : "";
+  return v!=null ? String(v) : "";
+}
+
+async function submit(){
+  const warn = $("warn");
+  const first = $("firstName").value.trim(), last = $("lastName").value.trim();
+  if(!first || !last){ warn.textContent="لطفاً نام و نام خانوادگی را وارد کنید."; warn.classList.add("show"); (!first?$("firstName"):$("lastName")).focus(); return; }
+
+  warn.classList.remove("show");
+  const btn = $("submitBtn"); btn.disabled=true; btn.textContent="در حال ارسال...";
+
+  const flat = {};
+  answerable.forEach(it => { flat[it.id] = fmt(it); });
+  const payload = { _subject: SURVEY.title+" — "+first+" "+last, first_name:first, last_name:last,
+    submitted_at:new Date().toISOString(), answered: answerable.filter(isAnswered).length+"/"+answerable.length, ...flat };
+
+  try{
+    const res = await fetch(SURVEY.formspree, { method:"POST", headers:{ "Content-Type":"application/json","Accept":"application/json" }, body:JSON.stringify(payload) });
+    if(!res.ok) throw new Error("bad");
+    store.clear(); renderReview(first,last);
+    $("formArea").style.display="none"; $("done").classList.add("show"); window.scrollTo({top:0,behavior:"smooth"});
+  }catch(e){
+    btn.disabled=false; btn.textContent="ثبت پاسخ‌ها"; warn.textContent="ارسال ناموفق بود. اتصال اینترنت را بررسی کنید و دوباره تلاش کنید."; warn.classList.add("show");
+  }
+}
+
+let pdfName = "responses";
+function renderReview(first, last){
+  $("doneName").textContent = first+" "+last+" عزیز، از همکاری شما سپاسگزاریم.";
+  pdfName = (first+"-"+last).replace(/\s+/g,"_");
+
+  let html="", sheet="";
+  SURVEY.items.forEach(it => {
+    if(it.type==="section"){ html+=`<li class="sec">${it.label}</li>`; sheet+=`<div class="p-sec">${it.label}</div>`; return; }
+    const val = fmt(it);
+    const shown = val || "— بدون پاسخ";
+    html  += `<li><div class="rq">${it.label}</div><div class="ra${val?"":" empty"}">${shown}</div></li>`;
+    sheet += `<div class="p-row"><div class="p-q">${it.label}</div><div class="p-a${val?"":" empty"}">${shown}</div></div>`;
+  });
+  $("review").innerHTML = html;
+  const when = new Date().toLocaleString("fa-IR");
+  $("pdfSheet").innerHTML = `<div class="p-h">${SURVEY.title}</div><div class="p-sub">${first} ${last} — ${when}</div>` + sheet;
+}
+
+async function downloadPDF(){
+  const btn = $("pdfBtn");
+  if(!(window.jspdf && window.html2canvas)){ window.print(); return; }
+  btn.disabled=true; const label=btn.textContent; btn.textContent="در حال ساخت PDF...";
+  try{
+    const canvas = await html2canvas($("pdfSheet"), { scale:2, backgroundColor:"#ffffff", windowWidth:794 });
+    const { jsPDF } = window.jspdf; const pdf = new jsPDF("p","mm","a4");
+    const pw=210, ph=297, iw=pw, ih=canvas.height*pw/canvas.width;
+    const img = canvas.toDataURL("image/jpeg", 0.92);
+    let pos=0, rem=ih; pdf.addImage(img,"JPEG",0,pos,iw,ih); rem-=ph;
+    while(rem>0){ pos-=ph; pdf.addPage(); pdf.addImage(img,"JPEG",0,pos,iw,ih); rem-=ph; }
+    pdf.save((SURVEY.title||"survey")+"-"+pdfName+".pdf");
+  }catch(e){ window.print(); }
+  finally{ btn.disabled=false; btn.textContent=label; }
+}
+
+$("pdfBtn").addEventListener("click", downloadPDF);
+$("printBtn").addEventListener("click", () => window.print());
+$("submitBtn").addEventListener("click", submit);
+build();
+</script>
+<script type="module" src="./survey-bg.min.js?v=2"></script>
+</body>
+</html>
