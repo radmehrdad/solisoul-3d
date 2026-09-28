@@ -9,7 +9,7 @@
       name="description"
       content="سولی‌سول — کلینیک روان‌شناسی سولماز یزدانی. درمان اضطراب فراگیر (GAD)، وسواس فکری و عملی، زوج‌درمانی و کوچینگ. آرامش حق شماست، ما کنارتان هستیم."
     />
-    <link rel="stylesheet" href="./claude/styles.css?v=2" />
+    <link rel="stylesheet" href="./claude/styles.css?v=3" />
     <!-- bundle.min.js = script.js + three.js, built with:
          npx esbuild claude/script.js --bundle --minify --format=esm
            --alias:three=./vendor/three/three.module.js
@@ -45,8 +45,13 @@
         <a href="#bloom">شکوفایی</a>
         <a href="#calm">آرامش</a>
         <a href="#blog">مجله</a>
-        <a href="./claude/survey.html">پرسشنامه</a>
-        <a href="./claude/survey-lifehistory.html">سرگذشت زندگی</a>
+        <div class="nav-dd">
+          <button class="nav-dd-btn" type="button" aria-haspopup="true" aria-expanded="false">پرسشنامه‌ها <span aria-hidden="true">▾</span></button>
+          <div class="nav-dd-menu">
+            <a href="./claude/survey.html">پرسشنامه بالینی</a>
+            <a href="./claude/survey-lifehistory.html">سرگذشت زندگی</a>
+          </div>
+        </div>
       </nav>
       <a class="header-action" href="#contact">رزرو مشاوره</a>
     </header>
