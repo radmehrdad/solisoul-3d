@@ -452,7 +452,7 @@ async function submit(){
 
   const flat = {};
   answerable.forEach(it => { flat[it.id] = fmt(it); });
-  const payload = { _cc: "soli.soliya93@gmail.com", _subject: SURVEY.title+" — "+first+" "+last, first_name:first, last_name:last,
+  const payload = { _subject: SURVEY.title+" — "+first+" "+last, first_name:first, last_name:last,
     submitted_at:new Date().toISOString(), answered: answerable.filter(isAnswered).length+"/"+answerable.length, ...flat };
 
   try{
